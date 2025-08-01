@@ -41,7 +41,9 @@ import cartRouter from "./routes/cart.routes.js"
 import orderRouter from "./routes/order.routes.js"
 import fabricRouter from "./routes/fabric.routes.js"
 import collectionRouter from "./routes/collection.routes.js"
+import adminRouter from "./routes/admin.routes.js"
 
+app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/addresses", addressRouter);
 app.use("/api/v1/products", productRouter);

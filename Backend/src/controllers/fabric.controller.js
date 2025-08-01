@@ -1,4 +1,3 @@
-// controllers/fabricController.js
 import {Fabric} from '../models/fabricc.model.js';
 import {Collection} from '../models/collection.model.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -7,6 +6,8 @@ import { validationResult } from "express-validator";
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import { upload } from '../middlewares/multer.middleware.js';
 import fs from 'fs/promises';
+import { getCollectionById } from './collection.controller.js';
+import mongoose from 'mongoose';
 
 export const fabricUploadMiddleware = upload.fields([
     { name: 'mainImage', maxCount: 1 },
@@ -15,18 +16,43 @@ export const fabricUploadMiddleware = upload.fields([
 
 const getAllFabrics = async (req, res, next) => {
     try {
-        const { page = 1, limit = 10, collectionId, material, color, pattern, minPrice, maxPrice } = req.query;
+        const { page = 1, limit = 10, collectionId, collectionName, material, color, pattern, minPrice, maxPrice } = req.query;
         const query = {};
 
-        if (collectionId) query.collectionId = collectionId;
-        if (material) query.material = material;
-        if (color) query.color = color;
-        if (pattern) query.pattern = pattern;
+        if (collectionId) {
+            if (mongoose.Types.ObjectId.isValid(collectionId)) {
+                query.collectionId = new mongoose.Types.ObjectId(collectionId);
+            } else {
+                return next(new ApiError(400, `Invalid collectionId format: ${collectionId}`));
+            }
+        }
+
+        if(collectionName && collectionName.trim() != '') query.collectionName = collectionName;
+        if (material && material.trim() !== '') query.material = material;
+        if (color && color.trim() !== '') query.color = color;
+        if (pattern && pattern.trim() !== '') query.pattern = pattern;
+        
         if (minPrice || maxPrice) {
             query.price = {};
-            if (minPrice) query.price.$gte = parseFloat(minPrice);
-            if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+            if (minPrice && minPrice.trim() !== '') {
+                const minPriceNum = parseFloat(minPrice);
+                if (!isNaN(minPriceNum)) {
+                    query.price.$gte = minPriceNum;
+                }
+            }
+            if (maxPrice && maxPrice.trim() !== '') {
+                const maxPriceNum = parseFloat(maxPrice);
+                if (!isNaN(maxPriceNum)) {
+                    query.price.$lte = maxPriceNum;
+                }
+            }
+            
+            if (Object.keys(query.price).length === 0) {
+                delete query.price;
+            }
         }
+
+        console.log("Final query object:", JSON.stringify(query, null, 2));
 
         const options = {
             page: parseInt(page),
@@ -39,13 +65,13 @@ const getAllFabrics = async (req, res, next) => {
         const fabrics = await Fabric.aggregatePaginate(fabricsAggregate, options);
 
         if (fabrics.docs.length === 0) {
-            return next(new ApiError(404, 'No Fabrics found matching your criteria'));
+            return next(new ApiError(404, `No Fabrics found matching your criteria`));
         }
 
         res.status(200).json(new ApiResponse(200, fabrics, 'Fabrics retrieved successfully'));
     } catch (error) {
         console.error("Error in getAllFabrics:", error);
-        next(new ApiError(500, 'Internal server error while retrieving fabrics.', error));
+        console.error("Error stack:", error.stack);
     }
 };
 
@@ -73,7 +99,6 @@ const addFabric = async (req, res, next) => {
         let mainImageUrl = null;
         let additionalImageUrls = [];
 
-        // Verify collection exists
         if (fabricData.collectionId) {
             const collection = await Collection.findById(fabricData.collectionId);
             if (!collection) {
@@ -81,7 +106,8 @@ const addFabric = async (req, res, next) => {
             }
         }
 
-        // Handle main image upload
+        const collectionName = await getCollectionById(fabricData.collectionId)
+
         if (req.files && req.files.mainImage && req.files.mainImage.length > 0) {
             const imageLocalPath = req.files.mainImage[0].path;
             console.log("Main image local path:", imageLocalPath);
@@ -99,7 +125,6 @@ const addFabric = async (req, res, next) => {
             return next(new ApiError(400, 'Main fabric image is required.'));
         }
 
-        // Handle additional images
         if (req.files && req.files.additionalImages && req.files.additionalImages.length > 0) {
             console.log(`Processing ${req.files.additionalImages.length} additional images.`);
             const uploadPromises = req.files.additionalImages.map(async (file) => {
@@ -119,6 +144,7 @@ const addFabric = async (req, res, next) => {
 
         const newFabricData = {
             name: fabricData.name,
+            collectionName: collectionName,
             collectionId: fabricData.collectionId,
             description: fabricData.description,
             price: parseFloat(fabricData.price),
@@ -143,7 +169,6 @@ const addFabric = async (req, res, next) => {
         const fabric = new Fabric(newFabricData);
         await fabric.save();
 
-        // Update fabric count in collection
         await Collection.findByIdAndUpdate(
             fabricData.collectionId,
             { $inc: { fabricCount: 1 } }
@@ -157,7 +182,6 @@ const addFabric = async (req, res, next) => {
         console.error("--- addFabric Controller Catch Block ---");
         console.error("Caught error:", error);
 
-        // Clean up uploaded files on error
         if (req.files) {
             if (req.files.mainImage && req.files.mainImage.length > 0) {
                 await fs.unlink(req.files.mainImage[0].path).catch(e => console.error("Failed to clean up local main image on error:", e));

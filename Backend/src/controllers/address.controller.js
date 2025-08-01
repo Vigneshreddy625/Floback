@@ -2,7 +2,6 @@ import { Address } from "../models/address.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-// CREATE Address
 const createAddress = async (req, res, next) => {
   try {
     const {
@@ -40,7 +39,6 @@ const createAddress = async (req, res, next) => {
   }
 };
 
-// READ Addresses
 const getAddresses = async (req, res, next) => {
   try {
     const address = await Address.findOne({ user: req.user.id }, { addresses: 1 }).lean();
@@ -55,7 +53,6 @@ const getAddresses = async (req, res, next) => {
   }
 };
 
-// UPDATE Address
 const updateAddress = async (req, res, next) => {
   try {
     const { id: addressId } = req.params;
@@ -86,7 +83,6 @@ const updateAddress = async (req, res, next) => {
   }
 };
 
-// DELETE Address
 const deleteAddress = async (req, res, next) => {
   try {
     const { id: addressId } = req.params;

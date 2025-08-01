@@ -1,6 +1,6 @@
+import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model.js';
 import { ApiError } from '../utils/ApiError.js';
-import jwt from 'jsonwebtoken';
 
 export const verifyJWT = async (req, res, next) => {
   try {
@@ -31,9 +31,35 @@ export const verifyJWT = async (req, res, next) => {
   }
 };
 
-export const isAdmin = (req, res, next) => {
-  if(!req.user || req.user,role !== "admin"){
-    throw new ApiError(403, "Admin access only");
+export const verifyAdmin = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new ApiError(401, 'Authentication required');
+    }
+
+    if (req.user.role !== 'admin') {
+      throw new ApiError(403, 'Admin access required');
+    }
+
+    next();
+  } catch (error) {
+    throw new ApiError(403, error?.message || 'Admin access required');
   }
-  next();
-}
+};
+
+// Optional: Super admin check for sensitive operations
+export const verifySuperAdmin = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new ApiError(401, 'Authentication required');
+    }
+
+    if (req.user.role !== 'superadmin') {
+      throw new ApiError(403, 'Super admin access required');
+    }
+
+    next();
+  } catch (error) {
+    throw new ApiError(403, error?.message || 'Super admin access required');
+  }
+};

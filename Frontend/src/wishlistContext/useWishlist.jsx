@@ -1,73 +1,132 @@
-// wishlistContext/useWishlist.js
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { toast } from 'sonner';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-axios.defaults.baseURL = API_URL;
+const API_URL = "http://localhost:8000/api/v1";
 
 const WishlistContext = createContext();
 
 export const WishlistProvider = ({ children }) => {
-  const [wishlistItems, setWishlistItems] = useState([]);
+  const [wishlist, setWishlist] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchWishlistItems = async () => {
+  const fetchWishlist = useCallback(async () => {
     setLoading(true);
+    setError(null); 
     try {
-      const response = await axios.get(`/api/v1/wishlist`);
-      setWishlistItems(response.data.data);
+      const response = await fetch(`${API_URL}/wishlist`, {
+        method: 'GET',
+        credentials: 'include', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch wishlist.");
+      }
+
+      const data = await response.json();
+      console.log("wishlist successful");
+      console.log(data.user); // Assuming user data is also returned
+      setWishlist(data.data); 
     } catch (err) {
-      setError(err.response?.data || err.message);
+      const errorMessage = err.message || "Failed to fetch wishlist.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      setWishlist(null); 
+    } finally {
+      setLoading(false);
+    }
+  }, []); 
+
+  useEffect(() => {
+    fetchWishlist();
+  }, [fetchWishlist]); 
+
+  const addWishlistItem = async ({ itemId, itemType }) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_URL}/wishlist`, {
+        method: 'POST',
+        credentials: 'include', // Important for sending cookies
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ itemId, itemType }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to add item to wishlist.");
+      }
+
+      const data = await response.json();
+      setWishlist(data.data); 
+      toast.success(data.message || "Item added to wishlist.");
+    } catch (err) {
+      const errorMessage = err.message || "Failed to add item to wishlist.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchWishlistItems();
-  }, []);
-
-  const addWishlistItem = async (productId) => {
+  const removeWishlistItem = async ({ itemId, itemType }) => {
+    setLoading(true);
+    setError(null);
     try {
-      await axios.post(`/api/v1/wishlist`, { productId });
-      setWishlistItems((prev) => [...prev, { _id: productId }]); // optional optimistic add
-      toast.success("Item added to wishlist.");
-      fetchWishlistItems(); // re-sync
-    } catch (err) {
-      setError(err.response?.data || err.message);
-      toast.error("Failed to add item to wishlist.");
-    }
-  };
-
-  const removeWishlistItem = async (productId) => {
-    // ✅ Optimistic remove
-    const prevItems = [...wishlistItems];
-    setWishlistItems((prev) => prev.filter((item) => item._id !== productId));
-
-    try {
-      await axios.delete(`/api/v1/wishlist`, {
-        data: { productId },
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch(`${API_URL}/wishlist`, {
+        method: 'DELETE',
+        credentials: 'include', // Important for sending cookies
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ itemId, itemType }),
       });
-      toast.success("Item removed from wishlist.");
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to remove item from wishlist.");
+      }
+
+      const data = await response.json();
+      setWishlist((prevWishlist) => ({
+        ...prevWishlist,
+        items: data.data, 
+      }));
+      fetchWishlist();
+      toast.success(data.message || "Item removed from wishlist.");
     } catch (err) {
-      setWishlistItems(prevItems); // revert
-      setError(err.response?.data || err.message);
-      toast.error("Failed to remove item from wishlist.");
+      const errorMessage = err.message || "Failed to remove item from wishlist.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const isItemInWishlist = useCallback(({ itemId, itemType }) => {
+    if (!wishlist || !wishlist.items) return false;
+    return wishlist.items.some(
+      (item) => item.itemId === itemId && item.itemType === itemType
+    );
+  }, [wishlist]);
 
   return (
     <WishlistContext.Provider
       value={{
-        wishlistItems,
+        wishlist, 
+        wishlistItems: wishlist ? wishlist.items : [], 
         loading,
         error,
         addWishlistItem,
         removeWishlistItem,
-        refetch: fetchWishlistItems,
+        isItemInWishlist, 
+        refetchWishlist: fetchWishlist, 
       }}
     >
       {children}

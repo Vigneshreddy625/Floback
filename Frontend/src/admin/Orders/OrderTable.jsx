@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { Package, ChevronRight, Edit, ChevronLeft } from "lucide-react";
-import EditOrderStatusModal from '../EditOrderStatusModal';
+import EditOrderStatusModal from '../Modals/EditOrderStatus';
+import { useDispatch } from 'react-redux';
 
-const OrderTable = ({ 
-  orders = [], 
+const OrderTable = ({
+  orders,
   selectedOrder, 
   setSelectedOrder, 
   pagination = {}, 
-  onPageChange 
+  onPageChange
 }) => {
-  const [editOrder, setEditOrder] = useState("");
+  const [editOrder, setEditOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const getStatusClasses = (status) => {
     switch (status?.toLowerCase()) {
@@ -21,8 +23,12 @@ const OrderTable = ({
       case "completed":
         return "bg-green-50 text-green-700 border border-green-200";
       case "pending":
+      case "processing": 
+      case "shipped":   
         return "bg-yellow-50 text-yellow-700 border border-yellow-200";
       case "cancelled":
+      case "failed": 
+      case "returned": 
         return "bg-red-50 text-red-700 border border-red-200";
       default:
         return "bg-gray-50 text-gray-700 border border-gray-200";
@@ -32,27 +38,39 @@ const OrderTable = ({
   const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
         ...(date.getFullYear() !== new Date().getFullYear() && { year: 'numeric' })
       });
-    } catch {
-      return dateString;
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateString; 
     }
   };
 
   const formatCurrency = (amount) => {
-    if (typeof amount === 'number') {
+    if (typeof amount === 'number' && !isNaN(amount)) {
       return `$${amount.toFixed(2)}`;
     }
-    return amount || '$0.00';
+    return `$0.00`; 
   };
 
   const PaginationControls = () => {
     if (!pagination || pagination.totalPages <= 1) return null;
 
-    const { currentPage, totalPages, hasNext, hasPrev } = pagination;
+    const { currentPage, totalPages, hasNext, hasPrev, totalItems } = pagination;
+
+    const handlePrev = () => {
+      onPageChange(currentPage - 1);
+    };
+
+    const handleNext = () => {
+      onPageChange(currentPage + 1);
+    };
 
     return (
       <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50/50">
@@ -60,25 +78,25 @@ const OrderTable = ({
           <span className="text-sm text-gray-700">
             Page {currentPage} of {totalPages}
           </span>
-          {pagination.totalItems && (
+          {totalItems !== undefined && ( 
             <span className="text-sm text-gray-500">
-              ({pagination.totalItems} total orders)
+              ({totalItems} total orders)
             </span>
           )}
         </div>
-        
+
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onPageChange(currentPage - 1)}
+            onClick={handlePrev}
             disabled={!hasPrev}
             className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
           >
             <ChevronLeft size={16} />
             Previous
           </button>
-          
+
           <button
-            onClick={() => onPageChange(currentPage + 1)}
+            onClick={handleNext}
             disabled={!hasNext}
             className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
           >
@@ -97,7 +115,7 @@ const OrderTable = ({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50/80">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order ID</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Items</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
@@ -109,16 +127,15 @@ const OrderTable = ({
             <tbody className="bg-white divide-y divide-gray-100">
               {orders.map((order) => (
                 <tr
-                  key={order.id || order._id}
+                  key={order.orderId || order._id} 
                   className={`hover:bg-gray-50 cursor-pointer ${
-                    selectedOrder && (selectedOrder.id === order.id || selectedOrder._id === order._id) 
+                    selectedOrder && (selectedOrder.orderId === order.orderId || selectedOrder._id === order._id)
                       ? "bg-blue-50" : ""
                   }`}
                   onClick={() => setSelectedOrder(order)}
-                  
                 >
                   <td className="px-6 py-5 text-sm font-semibold text-gray-900">
-                    {order.orderId || order.id || order._id}
+                    {order.orderId || order._id}
                   </td>
                   <td className="px-6 py-5 text-sm text-gray-900">
                     <div className="flex items-center">
@@ -132,36 +149,38 @@ const OrderTable = ({
                         }}
                       />
                       <div className="font-medium text-gray-900">
-                        {order.user?.fullName }
+                        {order.user?.fullName || order.customer?.name || 'N/A'}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-5 text-sm text-gray-600">
                     <div className="flex items-center">
                       <Package className="w-4 h-4 text-gray-400 mr-2" />
-                      {order.items?.length || order.orderItems?.length || 0} items
+                      {(order.items?.length || order.orderItems?.length || 0) + ' items'}
                     </div>
                   </td>
                   <td className="px-6 py-5 text-sm">
-                    <span className={`px-3 py-1.5 inline-flex text-xs font-semibold rounded-full ${getStatusClasses(order.status || order.orderStatus)}`}>
-                      {order.status || order.orderStatus || 'Unknown'}
+                    <span className={`px-3 py-1.5 inline-flex text-xs font-semibold rounded-full ${getStatusClasses(order.orderStatus || order.status)}`}>
+                      {order.orderStatus || order.status || 'Unknown'}
                     </span>
                   </td>
                   <td className="px-6 py-5 text-sm font-bold text-gray-900">
                     {formatCurrency(order.total || order.totalAmount)}
                   </td>
                   <td className="px-6 py-5 text-sm text-gray-500 font-medium">
-                    {formatDate(order.date || order.createdAt)}
+                    {formatDate(order.createdAt || order.date)}
                   </td>
                   <td className="px-6 py-5 text-center">
-                    <button 
+                    <button
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); 
                         setEditOrder(order);
                         setIsModalOpen(true);
                       }}
+                      className="inline-flex items-center justify-center p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      title="Edit order status"
                     >
-                      <Edit className="w-5 h-5 text-gray-400 mx-auto hover:text-gray-600 transition-colors" />
+                      <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors" />
                     </button>
                   </td>
                 </tr>
@@ -170,13 +189,12 @@ const OrderTable = ({
           </table>
         </div>
 
-        {/* Mobile view */}
         <div className="lg:hidden">
           {orders.map((order, index) => (
             <div
-              key={order.id || order._id}
+              key={order.orderId || order._id} 
               className={`border-b border-gray-100 hover:bg-gray-50/70 cursor-pointer transition-all duration-200 ${
-                selectedOrder && (selectedOrder.id === order.id || selectedOrder._id === order._id) 
+                selectedOrder && (selectedOrder.orderId === order.orderId || selectedOrder._id === order._id)
                   ? "bg-blue-50/80 border-l-4 border-blue-500" : ""
               } ${index === orders.length - 1 ? 'border-b-0' : ''}`}
               onClick={() => setSelectedOrder(order)}
@@ -185,21 +203,21 @@ const OrderTable = ({
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-gray-900 mb-1">
-                      {order.orderNumber || order.id || order._id}
+                      Order ID: {order.orderId || order._id}
                     </span>
                     <div className="flex items-center">
                       <Package className="w-3.5 h-3.5 text-gray-400 mr-1.5" />
                       <span className="text-xs text-gray-500 font-medium">
-                        {order.items?.length || order.orderItems?.length || 0} items
+                        {(order.items?.length || order.orderItems?.length || 0) + ' items'}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusClasses(order.status || order.orderStatus)}`}>
-                      {order.status || order.orderStatus || 'Unknown'}
+                    <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusClasses(order.orderStatus || order.status)}`}>
+                      {order.orderStatus || order.status || 'Unknown'}
                     </span>
                     <span className="text-xs text-gray-500 font-medium">
-                      {formatDate(order.date || order.createdAt)}
+                      {formatDate(order.createdAt || order.date)}
                     </span>
                   </div>
                 </div>
@@ -208,7 +226,7 @@ const OrderTable = ({
                   <div className="flex items-center">
                     <img
                       src={order.customer?.avatar || order.user?.avatar || "https://placehold.co/48x48/cccccc/333333?text=CS"}
-                      alt={order.customer?.name || order.user?.name || 'Customer'}
+                      alt={order.customer?.name || order.user?.fullName || 'Customer'}
                       className="w-12 h-12 rounded-full mr-3 border-2 border-gray-100 shadow-sm"
                       onError={(e) => {
                         e.target.onerror = null;
@@ -217,12 +235,12 @@ const OrderTable = ({
                     />
                     <div>
                       <div className="text-sm font-semibold text-gray-900 mb-0.5">
-                        {order.customer?.name || order.user?.name || order.customerName || 'Unknown Customer'}
+                        {order.user?.fullName || order.customer?.name || order.customerName || 'Unknown Customer'}
                       </div>
                       <div className="text-xs text-gray-500 font-medium">Customer</div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center">
                     <div className="text-right mr-3">
                       <div className="text-base font-bold text-gray-900 mb-0.5">
@@ -230,14 +248,16 @@ const OrderTable = ({
                       </div>
                       <div className="text-xs text-gray-500 font-medium">Total</div>
                     </div>
-                    <button 
+                    <button
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); 
                         setEditOrder(order);
                         setIsModalOpen(true);
                       }}
+                      className="inline-flex items-center justify-center p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      title="Edit order status"
                     >
-                      <Edit className="w-5 h-5 text-gray-400 mx-auto hover:text-gray-600 transition-colors" />
+                      <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors" />
                     </button>
                   </div>
                 </div>
@@ -256,11 +276,14 @@ const OrderTable = ({
 
         <PaginationControls />
       </div>
-      
-      <EditOrderStatusModal 
-        order={editOrder} 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+
+      <EditOrderStatusModal
+        order={editOrder}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditOrder(null); 
+        }}
       />
     </>
   );

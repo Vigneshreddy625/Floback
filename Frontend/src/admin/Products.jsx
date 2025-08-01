@@ -1,34 +1,58 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import ProductFormModal from "./UpdateProductsModal";
-import { ChevronLeft, ChevronRight, Edit } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit, Trash } from "lucide-react";
 import FilterBar from "./Filter";
+import EditProduct from "./Modals/EditProduct";
+
 import {
-  fetchFilteredProducts,
-  setFilters,
+  getAllProducts,
+  updateProduct,
+  updateFilters,
+  resetFilters,
   clearErrors,
-  selectFilteredProducts,
-  selectProductLoading,
-  selectProductError,
-  selectTotalProducts,
-  selectCurrentPage,
-  selectCurrentFilters,
-  selectOperationLoading,
-  selectOperationError,
+  selectProducts,
+  selectProductsLoading,
+  selectProductsError,
+  selectUpdateLoading,
+  selectUpdateError,
+  selectPagination,
+  selectFilters,
+} from "../redux/Products/productSlice";
+import ProductFilter from "./Filters/ProductFilter";
+import {
+  deleteProduct,
+  selectDeleteLoading,
+  selectDeleteError,
+  selectDeleteSuccess,
 } from "../redux/Products/productSlice";
 
 const AdminProductsList = () => {
   const dispatch = useDispatch();
-  const products = useSelector(selectFilteredProducts);
-  const loading = useSelector(selectProductLoading);
-  const error = useSelector(selectProductError);
-  const totalProducts = useSelector(selectTotalProducts);
-  const currentPage = useSelector(selectCurrentPage);
-  const currentFilters = useSelector(selectCurrentFilters);
-  const operationLoading = useSelector(selectOperationLoading);
-  const operationError = useSelector(selectOperationError);
+  const products = useSelector(selectProducts);
+  const loading = useSelector(selectProductsLoading);
+  const error = useSelector(selectProductsError);
+  const currentFilters = useSelector(selectFilters);
+  const { currentPage, totalPages, totalProducts, hasNextPage, hasPrevPage } =
+    useSelector(selectPagination);
+  const updateLoading = useSelector(selectUpdateLoading);
+  const updateError = useSelector(selectUpdateError);
+  const deleteLoading = useSelector(selectDeleteLoading);
+  const deleteError = useSelector(selectDeleteError);
+  const deleteSuccess = useSelector(selectDeleteSuccess);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
+
+  const fetchData = useCallback(
+    (filters) => {
+      dispatch(getAllProducts(filters));
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    fetchData(currentFilters);
+  }, [currentFilters, fetchData]);
 
   const calculateDiscount = (price, originalPrice) => {
     if (!originalPrice || originalPrice === 0) return 0;
@@ -46,32 +70,21 @@ const AdminProductsList = () => {
     }
   };
 
-  const fetchData = useCallback(
-    (filters) => {
-      dispatch(fetchFilteredProducts(filters));
-    },
-    [dispatch]
-  );
-
-  useEffect(() => {
-    fetchData(currentFilters);
-  }, [currentFilters, fetchData]);
-
-  const totalPages = Math.ceil(totalProducts / (currentFilters.limit || 20));
-
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      dispatch(setFilters({ ...currentFilters, page: newPage }));
+      dispatch(updateFilters({ page: newPage }));
     }
   };
 
+  console.log(products);
+
   const handleLimitChange = (e) => {
     const newLimit = parseInt(e.target.value);
-    dispatch(setFilters({ ...currentFilters, limit: newLimit, page: 1 }));
+    dispatch(updateFilters({ limit: newLimit, page: 1 }));
   };
 
   const handleFilterBarChange = (newFilters) => {
-    dispatch(setFilters({ ...currentFilters, ...newFilters, page: 1 }));
+    dispatch(updateFilters({ ...newFilters, page: 1 }));
   };
 
   const handleEditClick = (product) => {
@@ -86,9 +99,9 @@ const AdminProductsList = () => {
   };
 
   const handleUpdateProduct = (formData) => {
-    if (formData && formData._id) {
+    if (formData && formData.productId) {
       dispatch(
-        updateProduct({ productId: formData._id, productData: formData })
+        updateProduct({ productId: formData.productId, updateData: formData })
       )
         .unwrap()
         .then(() => {
@@ -101,57 +114,78 @@ const AdminProductsList = () => {
     }
   };
 
-  if (loading && products.length === 0) {
-    return <div className="text-center py-8">Loading products...</div>;
-  }
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
 
-  if (error) {
-    return <div className="text-center py-8 text-red-600">Error: {error}</div>;
+  const handleDeleteClick = (productId) => {
+    try {
+      dispatch(deleteProduct(productId));
+      setShowDeleteSuccess(true);
+      setTimeout(() => {
+        setShowDeleteSuccess(false);
+        onClose();
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+    }
+  };
+  if (showDeleteSuccess) {
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md mx-auto transform animate-bounce">
+          <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Trash className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Product Deleted!
+          </h2>
+          <p className="text-gray-600">
+            Your product has been successfully deleted.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <>
       <div className="px-4 text-gray-800">
-        <FilterBar
-          isOrdersPage={false}
-          isProductsPage={true}
+        <ProductFilter
+          setIsModalOpen={setIsModalOpen}
           onFilterChange={handleFilterBarChange}
-          activeFilters={currentFilters} 
+          activeFilters={currentFilters}
         />
-        {operationLoading && (
+
+        {updateLoading && (
           <div className="text-center text-blue-500 py-2">
             Updating product...
           </div>
         )}
-        {operationError && (
+        {updateError && (
           <div className="text-center text-red-600 py-2">
-            Update Error: {operationError}
+            Update Error: {updateError}
           </div>
         )}
 
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <div className="overflow-x-auto rounded-lg border border-gray-200 z-10">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="text-left px-4 py-2 font-medium text-gray-600">
+                <th className="text-left px-4 py-3 font-medium text-gray-600">
                   Product ID
                 </th>
-                <th className="text-center sm:text-left sm:pl-12 py-2 font-medium text-gray-600">
+                <th className="text-left px-4 py-3 font-medium text-gray-600">
                   Name
                 </th>
-                <th className="text-left px-4 py-2 font-medium text-gray-600">
+                <th className="text-left px-4 py-3 font-medium text-gray-600">
                   Category
                 </th>
-                <th className="text-left px-4 py-2 font-medium text-gray-600">
+                <th className="text-left px-4 py-3 font-medium text-gray-600">
                   Stock
                 </th>
-                <th className="text-left px-4 py-2 font-medium text-gray-600">
+                <th className="text-left px-4 py-3 font-medium text-gray-600">
                   Price
                 </th>
-                <th className="text-left px-4 py-2 font-medium text-gray-600">
-                  Discount
-                </th>
-                <th className="text-left px-4 py-2 font-medium text-gray-600">
+                <th className="text-center px-4 py-3 font-medium text-gray-600">
                   Edit
                 </th>
               </tr>
@@ -159,51 +193,30 @@ const AdminProductsList = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {products.length > 0 ? (
                 products.map((product) => (
-                  <tr key={product._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {product._id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg mr-3">
-                          {product.image ? (
-                            <img
-                              src={product.image}
-                              alt={product.title}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <span>📦</span>
-                          )}
-                        </div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {product.title}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {product.category}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <tr key={product.productId || product._id}>
+                    <td className="px-4 py-3">{product.productId}</td>
+                    <td className="px-4 py-3">{product.name}</td>
+                    <td className="px-4 py-3">{product.category}</td>
+                    <td className="px-4 py-3">
                       <span className={getStockColor(product.stockStatus)}>
-                        {product.stockStatus === "Out of Stock"
-                          ? "Out of Stock"
-                          : product.stockStatus}
+                        {product.stockStatus || "In Stock"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {product.price ? product.price.toFixed(2) : "0.00"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {calculateDiscount(product.price, product.originalPrice)}%
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-4 py-3">{product.price?.toFixed(2)}</td>
+                    <td className="px-4 py-3 flex justify-center space-x-3">
                       <button
-                        className="text-gray-400 hover:text-gray-600"
                         onClick={() => handleEditClick(product)}
-                        disabled={operationLoading}
+                        disabled={updateLoading}
+                        className="text-gray-500 hover:text-gray-700"
                       >
                         <Edit size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(product.productId)}
+                        disabled={deleteLoading}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <Trash size={16} />
                       </button>
                     </td>
                   </tr>
@@ -220,19 +233,16 @@ const AdminProductsList = () => {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 py-4 border-gray-200 text-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 py-4 text-sm mx-2">
         <div className="text-gray-700">
-          Result{" "}
-          {totalProducts > 0
-            ? (currentPage - 1) * (currentFilters.limit || 20) + 1
-            : 0}
-          -{Math.min(currentPage * (currentFilters.limit || 20), totalProducts)}{" "}
-          of {totalProducts}
+          Results {(currentPage - 1) * currentFilters.limit + 1} -{" "}
+          {Math.min(currentPage * currentFilters.limit, totalProducts)} of{" "}
+          {totalProducts}
           <select
-            className="ml-2 border border-gray-300 rounded px-2 py-1 text-sm"
-            value={currentFilters.limit || 20}
+            className="ml-2 border border-gray-300 rounded px-2 py-1"
+            value={currentFilters.limit}
             onChange={handleLimitChange}
-            disabled={loading || operationLoading}
+            disabled={loading || updateLoading}
           >
             <option value="10">10</option>
             <option value="20">20</option>
@@ -241,68 +251,57 @@ const AdminProductsList = () => {
           </select>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
-            className="flex items-center px-3 py-1 text-gray-600 hover:text-gray-900 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 border rounded"
             onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage <= 1 || loading || operationLoading}
+            disabled={!hasPrevPage || loading || updateLoading}
           >
-            <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+            <ChevronLeft className="w-4 h-4 inline" /> Prev
           </button>
-          {[...Array(totalPages)].map((_, index) => {
-            const pageNum = index + 1;
+
+          {[...Array(totalPages)].map((_, i) => {
+            const page = i + 1;
             if (
-              pageNum === 1 ||
-              pageNum === totalPages ||
-              (pageNum >= currentPage - 2 && pageNum <= currentPage + 2)
+              page === 1 ||
+              page === totalPages ||
+              (page >= currentPage - 2 && page <= currentPage + 2)
             ) {
               return (
                 <button
-                  key={pageNum}
+                  key={page}
+                  onClick={() => handlePageChange(page)}
                   className={`px-3 py-1 rounded ${
-                    currentPage === pageNum
+                    page === currentPage
                       ? "bg-blue-600 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  onClick={() => handlePageChange(pageNum)}
-                  disabled={loading || operationLoading}
+                      : "hover:bg-gray-100"
+                  }`}
+                  disabled={loading || updateLoading}
                 >
-                  {pageNum}
+                  {page}
                 </button>
               );
-            }
-            if (
-              (pageNum === currentPage - 3 && pageNum > 1) ||
-              (pageNum === currentPage + 3 && pageNum < totalPages)
-            ) {
-              return (
-                <span
-                  key={`ellipsis-${pageNum}`}
-                  className="px-2 text-gray-500"
-                >
-                  ...
-                </span>
-              );
+            } else if (page === currentPage - 3 || page === currentPage + 3) {
+              return <span key={`ellipsis-${page}`}>...</span>;
             }
             return null;
           })}
+
           <button
-            className="flex items-center px-3 py-1 text-gray-600 hover:text-gray-900 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 border rounded"
             onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage >= totalPages || loading || operationLoading}
+            disabled={!hasNextPage || loading || updateLoading}
           >
-            Next <ChevronRight className="w-4 h-4 ml-1" />
+            Next <ChevronRight className="w-4 h-4 inline" />
           </button>
         </div>
       </div>
 
       {isModalOpen && (
-        <ProductFormModal
+        <EditProduct
           isOpen={isModalOpen}
           onClose={handleModalClose}
           product={productToEdit}
-          isLoading={operationLoading}
-          error={operationError}
           onSubmit={handleUpdateProduct}
         />
       )}

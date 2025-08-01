@@ -1,23 +1,13 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react'; 
 import { Link } from 'react-router-dom';
 import { BarChart3, Package, Users, Box } from 'lucide-react';
 
+import { useDispatch, useSelector } from 'react-redux';
 
-const dummyOrders = [
-  { id: '#12345', customer: 'Alice Smith', date: '2025-07-15', status: 'Pending', total: '$150.00' },
-  { id: '#12346', customer: 'Bob Johnson', date: '2025-07-14', status: 'Shipped', total: '$230.50' },
-  { id: '#12347', customer: 'Charlie Brown', date: '2025-07-13', status: 'Delivered', total: '$85.20' },
-  { id: '#12348', customer: 'Diana Prince', date: '2025-07-12', status: 'Pending', total: '$420.00' },
-  { id: '#12349', customer: 'Eve Adams', date: '2025-07-11', status: 'Delivered', total: '$75.00' },
-];
-
-const dummyProducts = [
-  { id: 'PROD001', name: 'Wireless Headphones', price: '$99.99', date: '2025-07-15', image: 'https://placehold.co/60x60/fefefe/333?text=🎧' },
-  { id: 'PROD002', name: 'Smartwatch V2', price: '$199.00', date: '2025-07-14', image: 'https://placehold.co/60x60/fefefe/333?text=⌚' },
-  { id: 'PROD003', name: 'USB-C Hub', price: '$45.50', date: '2025-07-13', image: 'https://placehold.co/60x60/fefefe/333?text=🔌' },
-  { id: 'PROD004', name: 'Portable Charger', price: '$30.00', date: '2025-07-12', image: 'https://placehold.co/60x60/fefefe/333?text=⚡' },
-  { id: 'PROD005', name: 'Ergonomic Mouse', price: '$25.00', date: '2025-07-11', image: 'https://placehold.co/60x60/fefefe/333?text=🖱️' },
-];
+import {
+  getAllOrders,
+  selectAllOrders,
+} from "../redux/Orders/orderSlice";
 
 const statusColors = {
   Pending: 'bg-yellow-100 text-yellow-700',
@@ -39,7 +29,7 @@ const InfoCard = ({ title, value, icon: Icon, gradient }) => (
   </div>
 );
 
-const OrdersTable = () => (
+const OrdersTable = ({orders, formatDate}) => (
   <div className="bg-white rounded-3xl px-6 py-4 shadow-xl border border-gray-200">
     <div className="flex justify-between items-center mb-4">
       <h2 className="text-xl font-semibold text-gray-800">🧾 Recent Orders</h2>
@@ -57,14 +47,15 @@ const OrdersTable = () => (
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {dummyOrders.map(order => (
-            <tr key={order.id} className="hover:bg-gray-50 transition">
-              <td className="px-4 py-4 font-medium text-gray-800">{order.id}</td>
-              <td className="px-4 py-4">{order.customer}</td>
-              <td className="px-4 py-4 text-gray-500">{order.date}</td>
+          {/* Use the 'orders' prop directly, which comes from Redux */}
+          {orders.map(order => (
+            <tr key={order.orderId} className="hover:bg-gray-50 transition">
+              <td className="px-4 py-4 font-medium text-gray-800">{order.orderId}</td>
+              <td className="px-4 py-4">{order.user.fullName}</td>
+              <td className="px-4 py-4 text-gray-500">{formatDate(order.createdAt || order.date)}</td>
               <td className="px-4 py-4">
-                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColors[order.status]}`}>
-                  {order.status}
+                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColors[order.orderStatus]}`}>
+                  {order.orderStatus}
                 </span>
               </td>
               <td className="px-4 py-4 text-right font-medium text-gray-800">{order.total}</td>
@@ -76,7 +67,7 @@ const OrdersTable = () => (
   </div>
 );
 
-const ProductsTable = () => (
+const ProductsTable = ({orders, formatDate}) => (
   <div className="bg-white rounded-3xl px-4 py-4 shadow-xl border border-gray-200">
     <div className="flex justify-between items-center mb-4">
       <h2 className="text-xl font-semibold text-gray-800">🛍️ Recently Bought Products</h2>
@@ -86,6 +77,7 @@ const ProductsTable = () => (
       <table className="min-w-full text-sm text-left">
         <thead className="bg-gray-100 text-xs uppercase text-gray-500">
           <tr>
+            <th className="px-4 py-3">Order ID</th>
             <th className="px-4 py-3">Product</th>
             <th className="px-4 py-3">Product ID</th>
             <th className="px-4 py-3">Date</th>
@@ -93,15 +85,15 @@ const ProductsTable = () => (
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {dummyProducts.map(product => (
-            <tr key={product.id} className="hover:bg-gray-50 transition">
-              <td className="px-4 py-2 flex items-center gap-3">
-                <img src={product.image} alt={product.name} className="w-10 h-10 rounded-md border" />
-                <span className="font-medium text-gray-800">{product.name}</span>
+          {orders.map(order => (
+            <tr key={order._id} className="hover:bg-gray-50 transition">
+              <td className="px-4 py-4">{order.orderId}</td>
+              <td className="px-4 py-2">
+                <span className="font-medium text-gray-800">{order.items[0].title}</span>
               </td>
-              <td className="px-4 py-4">{product.id}</td>
-              <td className="px-4 py-4 text-gray-500">{product.date}</td>
-              <td className="px-4 py-4 text-right font-medium text-gray-800">{product.price}</td>
+              <td className="px-4 py-4">{order.items[0].itemId}</td>
+              <td className="px-4 py-4 text-gray-500">{formatDate(order.createdAt || order.date)}</td>
+              <td className="px-4 py-4 text-right font-medium text-gray-800">{order.items[0].price}</td>
             </tr>
           ))}
         </tbody>
@@ -110,48 +102,77 @@ const ProductsTable = () => (
   </div>
 );
 
-// Usage in your dashboard:
-const DashboardPage = () => (
-  <div className="px-4 sm:px-6 lg:px-8 py-6 bg-gradient-to-tr from-[#f8fafc] to-[#e2e8f0] min-h-screen space-y-6">
-    {/* Info Cards Grid */}
-    <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
-      <InfoCard
-        title="Total Revenue"
-        value="$85,420"
-        icon={BarChart3}
-        gradient="bg-gradient-to-br from-[#667eea] to-[#764ba2]"
-      />
-      <InfoCard
-        title="Total Orders"
-        value="1,280"
-        icon={Package}
-        gradient="bg-gradient-to-br from-[#f7971e] to-[#ffd200]"
-      />
-      <InfoCard
-        title="Users"
-        value="750"
-        icon={Users}
-        gradient="bg-gradient-to-br from-[#56ab2f] to-[#a8e063]"
-      />
-      <InfoCard
-        title="Products"
-        value="240"
-        icon={Box}
-        gradient="bg-gradient-to-br from-[#ee0979] to-[#ff6a00]"
-      />
-    </div>
+function DashboardPage()  {
+  const dispatch = useDispatch();
+  const orders = useSelector(selectAllOrders); // orders from Redux
+  const fetchData = useCallback(() => {
+      dispatch(getAllOrders({limit : 5}));
+    }, [dispatch]); 
+  
+    useEffect(() => {
+      fetchData();
+    }, [fetchData]);
 
-    {/* Orders Table */}
-    <div className="w-full">
-      <OrdersTable />
-    </div>
+  console.log(orders);
 
-    {/* Products Table */}
-    <div className="w-full">
-      <ProductsTable />
-    </div>
-  </div>
-);
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        ...(date.getFullYear() !== new Date().getFullYear() && { year: 'numeric' })
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateString; 
+    }
+  };
 
+  return(
+    <div className="px-4 sm:px-6 lg:px-8 py-6 bg-gradient-to-tr from-[#f8fafc] to-[#e2e8f0] min-h-screen space-y-6">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
+        <InfoCard
+          title="Total Revenue"
+          value="$85,420"
+          icon={BarChart3}
+          gradient="bg-gradient-to-br from-[#667eea] to-[#764ba2]"
+        />
+        <InfoCard
+          title="Total Orders"
+          value="1,280"
+          icon={Package}
+          gradient="bg-gradient-to-br from-[#f7971e] to-[#ffd200]"
+        />
+        <InfoCard
+          title="Users"
+          value="750"
+          icon={Users}
+          gradient="bg-gradient-to-br from-[#56ab2f] to-[#a8e063]"
+        />
+        <InfoCard
+          title="Products"
+          value="240"
+          icon={Box}
+          gradient="bg-gradient-to-br from-[#ee0979] to-[#ff6a00]"
+        />
+      </div>
+
+      {/* Orders Table */}
+      <div className="w-full">
+        {/* Pass the 'orders' from Redux to the OrdersTable component */}
+        <OrdersTable orders={orders} formatDate={formatDate} />
+      </div>
+
+      {/* Products Table - currently uses dummy data */}
+      <div className="w-full">
+        <ProductsTable orders={orders} formatDate={formatDate}/>
+      </div>
+    </div>
+  )
+};
 
 export default DashboardPage;

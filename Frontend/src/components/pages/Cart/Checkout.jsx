@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { CreditCard, ArrowLeft } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import LoadingScreen from "../Items/LoadingScreen";
-import { fetchAddresses } from "../../redux/Address/addressSlice";
+import { fetchAddresses } from "../../../redux/Address/addressSlice";
 import AddressList from "./AddressList";
 import NewAddress from "../Addresses/NewAddress";
 

@@ -4,8 +4,8 @@ import {
   addProduct,
   updateProduct,
   getProductById,
+  deleteProduct,
 } from '../controllers/product.controller.js';
-import { verifyJWT, isAdmin } from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
 
 const router = Router();
@@ -13,11 +13,12 @@ const router = Router();
 router.route('/add').post(
   upload.fields([
     { name: 'mainImage', maxCount: 1 }, 
-    { name: 'images', maxCount: 10 }, 
+    { name: 'additionalImages', maxCount: 10 }, 
   ]),
   addProduct
 );
 router.route('/update/:productId').patch(updateProduct);
+router.route('/delete/:productId').delete(deleteProduct);
 router.route('/all').get(getAllProducts);
 router.route('/:productId').get(getProductById); 
 

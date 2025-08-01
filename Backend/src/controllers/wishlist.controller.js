@@ -80,7 +80,7 @@ export const removeFromWishlist = async (req, res, next) => {
 
     
     if (!isValidObjectId(itemId)) {
-      return next(new ApiError(400, 'Invalid item ID provided.'));
+      return next(new ApiError(400, `Invalid item ID provided. ${itemId}`));
     }
 
     if (!['Product', 'Fabric'].includes(itemType)) {
@@ -120,11 +120,12 @@ export const removeFromWishlist = async (req, res, next) => {
   }
 };
 
-export const getUserWishlist = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
-
+export const getUserWishlist = async (req, res) => {
+    const userId = req.user?._id || req.user?.id;
     if (!userId) {
-        throw new ApiError(401, "Unauthorized access: User ID not found from token.");
+        return res
+            .status(200)
+            .json(new ApiResponse(200, { user: null, items: [] }, "User not authenticated, returning an empty wishlist."));
     }
 
     const wishlist = await Wishlist.findOne({ user: userId }).populate({
@@ -140,8 +141,8 @@ export const getUserWishlist = asyncHandler(async (req, res) => {
 
     const formattedItems = wishlist.items.map(wishlistItem => {
         const originalItem = wishlistItem.itemId;
-        let currentItemTitle = wishlistItem.nameSnapshot;   
-        let currentItemImageUrl = wishlistItem.imageSnapshot; 
+        let currentItemTitle = wishlistItem.nameSnapshot;
+        let currentItemImageUrl = wishlistItem.imageSnapshot;
 
         let currentItemColor = null;
         let currentItemSize = null;
@@ -150,13 +151,12 @@ export const getUserWishlist = asyncHandler(async (req, res) => {
         let isItemAvailable = true;
 
         if (originalItem) {
-            
             currentItemTitle = originalItem.name;
             currentItemImageUrl = originalItem.mainImageUrl;
             currentItemColor = originalItem.color;
             currentItemSize = originalItem.dimensions
                 ? `${originalItem.dimensions.length}x${originalItem.dimensions.width}${originalItem.dimensions.unit}`
-                : originalItem.size; 
+                : originalItem.size;
             currentItemMaterial = originalItem.material;
             currentItemPattern = originalItem.pattern;
         } else {
@@ -165,11 +165,11 @@ export const getUserWishlist = asyncHandler(async (req, res) => {
             );
             isItemAvailable = false;
             currentItemTitle = `[Unavailable] ${currentItemTitle || wishlistItem.itemType}`;
-            currentItemImageUrl = currentItemImageUrl || '/path/to/unavailable_image.png'; 
+            currentItemImageUrl = currentItemImageUrl || '/path/to/unavailable_image.png';
         }
 
         return {
-            _id: wishlistItem._id, 
+            _id: wishlistItem._id,
             itemId: wishlistItem.itemId,
             itemType: wishlistItem.itemType,
             currentTitle: currentItemTitle,
@@ -185,7 +185,7 @@ export const getUserWishlist = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200, 
+            new ApiResponse(200,
                 {
                     _id: wishlist._id,
                     user: wishlist.user,
@@ -196,4 +196,4 @@ export const getUserWishlist = asyncHandler(async (req, res) => {
                 "User wishlist fetched successfully."
             )
         );
-});
+};

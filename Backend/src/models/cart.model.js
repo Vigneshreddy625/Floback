@@ -15,7 +15,6 @@ const cartItemSchema = new mongoose.Schema({
         required: true,
         min: 1
     },
-    // 👉 Store extra fields directly inside item
     name: String,
     mainImageUrl: String,
     price: Number

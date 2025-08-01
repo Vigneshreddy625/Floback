@@ -5,7 +5,7 @@ import {
   updateFabric,
   getFabricById,
 } from '../controllers/fabric.controller.js';
-import { verifyJWT, isAdmin } from '../middlewares/auth.middleware.js';
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
 
 const router = Router();
@@ -13,7 +13,7 @@ const router = Router();
 router.route('/add').post(
   upload.fields([
     { name: 'mainImage', maxCount: 1 }, 
-    { name: 'images', maxCount: 10 }, 
+    { name: 'additionalImages', maxCount: 10 }, 
   ]),
   addFabric
 );

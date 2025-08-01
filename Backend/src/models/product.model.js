@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { nanoid } from 'nanoid'; 
-import { Product } from './product.model.js'; 
 const productSchema = new mongoose.Schema({
     productId: {
         type: String,
@@ -16,8 +15,7 @@ const productSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum : ['Product', 'Fabric'],
-        required: true
+        default : 'Product',
     },
     description: {
         type: String,
@@ -26,6 +24,10 @@ const productSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true
+    },
+    color: {
+        type: String,
+        trim: true
     },
     mainImageUrl: {
         type: String,
@@ -65,6 +67,10 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    features: [{
+        type: String,
+        trim: true
+    }],
 }, { timestamps: true });
 
 productSchema.plugin(mongooseAggregatePaginate);

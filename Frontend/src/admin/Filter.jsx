@@ -5,9 +5,8 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
+} from "../components/ui/select"
 import { Plus } from "lucide-react";
-import ProductFormModal from "./AddProductModal"; // Assuming this is for adding new products, separate from update modal
 
 const FilterBar = ({
   isOrdersPage,
@@ -209,10 +208,7 @@ const FilterBar = ({
         </div>
       </div>
 
-      <ProductFormModal
-        isOpen={productFormModal}
-        onClose={() => setProductFormModal(false)}
-      />
+      
     </>
   );
 };

@@ -6,36 +6,42 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+} from "../../components/ui/dialog";
+import { Input } from "../../components/ui/input"
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
+} from "../../components/ui/select";
 
+const statusOptions = [
+  "Pending",
+  "Processing",
+  "Shipped",
+  "Delivered",
+  "Cancelled",
+  "Returned",
+  "Failed",
+];
 
-const statusOptions = ["Pending", "Processing", "Completed", "Delivered", "Cancelled"];
-
-const EditOrderStatusModal = ({ isOpen, onClose,  order }) => {
-  const [status, setStatus] = useState(order.orderStatus);
+const EditOrderStatusModal = ({ isOpen, onClose, order, onSubmit }) => {
+  const [status, setStatus] = useState("Shipped");
 
   useEffect(() => {
-  if (order) {
-    setStatus(order.orderStatus);
-  }
-}, [order]);
-
-  console.log(order);
+    if (order) {
+      setStatus(order.orderStatus);
+    }
+  }, [order]);
 
   const handleSubmit = () => {
-    // onSubmit({ ...order, status });
     onClose();
   };
+
+  if (!order) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -50,7 +56,6 @@ const EditOrderStatusModal = ({ isOpen, onClose,  order }) => {
         </DialogHeader>
 
         <div className="grid grid-cols-1 gap-5 mt-6">
-          {/* Order ID */}
           <div className="p-3 bg-white border rounded-xl">
             <Label className="text-sm text-gray-700">Order ID</Label>
             <Input
@@ -87,7 +92,7 @@ const EditOrderStatusModal = ({ isOpen, onClose,  order }) => {
           </Button>
           <Button
             onClick={handleSubmit}
-            className="bg-green-600 hover:bg-green-700 text-white  mb-2 sm:mb-0"
+            className="bg-green-600 hover:bg-green-700 text-white mb-2 sm:mb-0"
           >
             Update Status
           </Button>
@@ -97,4 +102,5 @@ const EditOrderStatusModal = ({ isOpen, onClose,  order }) => {
   );
 };
 
-export default EditOrderStatusModal;
+
+export default EditOrderStatusModal

@@ -4,73 +4,109 @@ import { toast } from "sonner";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 axios.defaults.baseURL = API_URL;
+axios.defaults.withCredentials = true;
 
-export const addToCart = createAsyncThunk(
-  "cart/addToCart",
-  async (productId, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(`/api/v1/cart/add`, { productId });
-      return response.data;
-    } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Add to cart failed"
-      );
-    }
-  }
-);
 
-export const updateCartItem = createAsyncThunk(
-  "cart/updateCartItem",
-  async ({ productId, quantity }, { rejectWithValue }) => {
+export const addItemToCart = createAsyncThunk(
+  "cart/addItemToCart",
+  async ({ itemType, itemId, quantity = 1 }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/api/v1/cart/update`, {
-        productId,
+      console.log("cart is going to get added")
+      const response = await axios.post(`/cart/add`, {
+        itemType,
+        itemId,
         quantity,
       });
+      toast.success(response.data.message || "Item added to cart!");
       return response.data;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Update quantity failed"
-      );
+      const errorMessage =
+        err.response?.data?.message || "Failed to add item to cart.";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
 
-export const removeFromCart = createAsyncThunk(
-  "cart/removeFromCart",
-  async (productId, { rejectWithValue }) => {
+export const updateCartItemQuantity = createAsyncThunk(
+  "cart/updateCartItemQuantity",
+  async ({ itemId, itemType, quantity }, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(`/api/v1/cart/remove/${productId}`);
+      const response = await axios.put(`/cart/update-quantity`, {
+        itemId,
+        itemType,
+        quantity,
+      });
+      toast.success(response.data.message || "Cart item quantity updated!");
       return response.data;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Remove item failed"
-      );
+      const errorMessage =
+        err.response?.data?.message || "Failed to update cart item quantity.";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
 
-export const fetchCart = createAsyncThunk(
-  "cart/fetchCart",
+export const removeItemFromCart = createAsyncThunk(
+  "cart/removeItemFromCart",
+  async ({ itemId, itemType, quantityToRemove }, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(`/cart/remove/${itemId}/${itemType}`, {
+        data: { quantityToRemove }, 
+      });
+      toast.success(response.data.message || "Item removed from cart!");
+      return response.data;
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Failed to remove item from cart.";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+
+export const fetchUserCart = createAsyncThunk(
+  "cart/fetchUserCart",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/v1/cart`);
+      const response = await axios.get(`/cart`);
       return response.data;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Fetch cart failed"
-      );
+      const errorMessage =
+        err.response?.data?.message || "Failed to fetch cart.";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+
+export const clearUserCart = createAsyncThunk(
+  "cart/clearUserCart",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(`/cart/clear`);
+      toast.success(response.data.message || "Cart cleared successfully!");
+      return response.data;
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Failed to clear cart.";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
 
 const initialState = {
-  cart: null,
+  cart: null, 
   loading: {
     fetch: false,
     add: false,
     update: false,
     remove: false,
+    clear: false,
   },
   error: null,
 };
@@ -86,124 +122,98 @@ const cartSlice = createSlice({
         add: false,
         update: false,
         remove: false,
+        clear: false,
       };
       state.error = null;
     },
-    addToCartOptimistic: (state, action) => {
-      if (!state.cart) return;
-      const product = action.payload;
-      const existing = state.cart.items.find(
-        (i) => i.product._id === product._id
-      );
-      if (existing) {
-        existing.quantity += 1;
-      } else {
-        state.cart.items.push({
-          _id: Date.now().toString(),
-          product,
-          quantity: 1,
-        });
-      }
-    },
-    removeFromCartOptimistic: (state, action) => {
-      if (!state.cart) return;
-      const { productId } = action.payload;
-      state.cart.items = state.cart.items.filter(
-        (i) => i.product._id !== productId
-      );
-    },
-    updateCartItemOptimistic: (state, action) => {
-      if (!state.cart) return;
-
-      const { productId, quantity } = action.payload;
-      const item = state.cart.items.find((i) => i.product._id === productId);
-
-      if (item) {
-        item.quantity = quantity;
-      }
-
-      const subtotal = state.cart.items.reduce(
-        (total, item) =>
-          total + Number((item.product.price * item.quantity).toFixed(2)),
-        0
-      );
-
-      const taxRate = 0.07;
-      const tax = subtotal * taxRate;
-
-      const shippingCost = subtotal > 1000 ? 0 : 5.99;
-
-      state.cart.shipping = {
-        cost: shippingCost,
-      };
-
-      const total = Math.max(0, subtotal + tax + shippingCost);
-
-      state.cart.subtotal = parseFloat(subtotal.toFixed(2));
-      state.cart.tax = parseFloat(tax.toFixed(2));
-      state.cart.total = parseFloat(total.toFixed(2));
-    },
-
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCart.pending, (state) => {
+      .addCase(fetchUserCart.pending, (state) => {
         state.loading.fetch = true;
         state.error = null;
       })
-      .addCase(fetchCart.fulfilled, (state, action) => {
+      .addCase(fetchUserCart.fulfilled, (state, action) => {
         state.loading.fetch = false;
-        state.cart = action.payload;
+        state.cart = action.payload.data;
+        state.error = null;
       })
-      .addCase(fetchCart.rejected, (state, action) => {
+      .addCase(fetchUserCart.rejected, (state, action) => {
         state.loading.fetch = false;
         state.error = action.payload;
+        state.cart = null; 
       })
-      .addCase(addToCart.pending, (state) => {
+
+      .addCase(addItemToCart.pending, (state) => {
         state.loading.add = true;
+        state.error = null;
       })
-      .addCase(addToCart.fulfilled, (state, action) => {
+      .addCase(addItemToCart.fulfilled, (state, action) => {
         state.loading.add = false;
-        state.cart = action.payload;
-        toast.success("Item added to cart!");
+        state.cart = action.payload.cart;
+        state.error = null;
       })
-      .addCase(addToCart.rejected, (state, action) => {
+      .addCase(addItemToCart.rejected, (state, action) => {
         state.loading.add = false;
-        toast.error(action.payload);
         state.error = action.payload;
       })
-      .addCase(removeFromCart.pending, (state) => {
-        state.loading.remove = true;
-      })
-      .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.loading.remove = false;
-        state.cart = action.payload;
-        toast.success("Item removed from cart!");
-      })
-      .addCase(removeFromCart.rejected, (state, action) => {
-        state.loading.remove = false;
-        state.error = action.payload;
-        toast.error(action.payload || "Remove failed");
-      })
-      .addCase(updateCartItem.pending, (state) => {
+
+      .addCase(updateCartItemQuantity.pending, (state) => {
         state.loading.update = true;
+        state.error = null;
       })
-      .addCase(updateCartItem.fulfilled, (state, action) => {
+      .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
         state.loading.update = false;
-        state.cart = action.payload;
+        state.cart = action.payload.cart;
+        state.error = null;
       })
-      .addCase(updateCartItem.rejected, (state, action) => {
+      .addCase(updateCartItemQuantity.rejected, (state, action) => {
         state.loading.update = false;
         state.error = action.payload;
-        toast.error(action.payload || "Update failed");
+      })
+
+      .addCase(removeItemFromCart.pending, (state) => {
+        state.loading.remove = true;
+        state.error = null;
+      })
+      .addCase(removeItemFromCart.fulfilled, (state, action) => {
+        state.loading.remove = false;
+        state.cart = action.payload.cart;
+        state.error = null;
+      })
+      .addCase(removeItemFromCart.rejected, (state, action) => {
+        state.loading.remove = false;
+        state.error = action.payload;
+      })
+
+      .addCase(clearUserCart.pending, (state) => {
+        state.loading.clear = true;
+        state.error = null;
+      })
+      .addCase(clearUserCart.fulfilled, (state, action) => {
+        state.loading.clear = false;
+        state.cart = action.payload.cart;
+        state.error = null;
+      })
+      .addCase(clearUserCart.rejected, (state, action) => {
+        state.loading.clear = false;
+        state.error = action.payload;
       });
   },
 });
 
 export const {
   resetCartState,
-  addToCartOptimistic,
-  updateCartItemOptimistic,
-  removeFromCartOptimistic,
+  adddItemToCart,
+  addItemToCartOptimistic, 
 } = cartSlice.actions;
+
 export default cartSlice.reducer;
+
+export const selectCart = (state) => state.cart.cart;
+export const selectIsCartLoading = (state) => state.cart.loading.fetch;
+export const selectIsAddingToCart = (state) => state.cart.loading.add;
+export const selectIsUpdatingCart = (state) => state.cart.loading.update;
+export const selectIsRemovingFromCart = (state) => state.cart.loading.remove;
+export const selectIsClearingCart = (state) => state.cart.loading.clear;
+export const selectCartError = (state) => state.cart.error;

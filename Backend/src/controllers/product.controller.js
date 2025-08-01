@@ -14,7 +14,7 @@ export const productUploadMiddleware = upload.fields([
 
 const getAllProducts = async (req, res, next) => {
     try {
-        const { page = 1, limit = 10, category, material, style, pattern, minPrice, maxPrice } = req.query;
+        const { page = 1, limit = 20, category, material, style, pattern, minPrice, maxPrice } = req.query;
         const query = {};
 
         if (category) query.category = category;
@@ -115,7 +115,6 @@ const addProduct = async (req, res, next) => {
             console.log("Main image Cloudinary URL:", mainImageUrl);
         } else {
             console.error("No main product image found in req.files.");
-            return next(new ApiError(400, 'Main product image is required.'));
         }
 
         if (req.files && req.files.additionalImages && req.files.additionalImages.length > 0) {
@@ -132,7 +131,7 @@ const addProduct = async (req, res, next) => {
                     return null; 
                 }
             });
-            additionalImageUrls = (await Promise.all(uploadPromises)).filter(url => url !== null); // Filter out nulls
+            additionalImageUrls = (await Promise.all(uploadPromises)).filter(url => url !== null); 
         } else {
             console.log("No additional images provided or found.");
         }
@@ -224,6 +223,49 @@ const addProduct = async (req, res, next) => {
     }
 };
 
+export const deleteProduct = async (req, res, next) => {
+    try {
+        console.log("--- deleteProduct Controller Start ---");
+        const { productId } = req.params;
+
+        if (!productId) {
+            return next(new ApiError(400, 'Product ID is required.'));
+        }
+
+        console.log(`Attempting to delete product with productId: ${productId}`);
+
+        const productToDelete = await Product.findOne({ productId: productId });
+
+        if (!productToDelete) {
+            return next(new ApiError(404, 'Product not found.'));
+        }
+
+        console.log(`Found product to delete: ${productToDelete.name}`);
+
+        await Product.deleteOne({ productId: productId });
+
+        console.log(`Product with productId ${productId} successfully deleted from database`);
+
+        res.status(200).json(
+            new ApiResponse(200, { productId: productId }, 'Product deleted successfully')
+        );
+
+        console.log("--- deleteProduct Controller End (Success) ---");
+
+    } catch (error) {
+        console.error("--- deleteProduct Controller Catch Block ---");
+        console.error("Caught error:", error);
+
+        if (error.name === 'CastError') {
+            console.error("Mongoose Cast Error:", error.message);
+            return next(new ApiError(400, `Invalid product ID format.`, error));
+        }
+
+        console.error("Generic Internal Server Error:", error.message, error.stack);
+        next(new ApiError(500, 'Internal server error while deleting product.', error));
+    }
+};
+
 const updateProduct = async (req, res, next) => {
     try {
         const { productId: paramProductId } = req.params; 
@@ -260,11 +302,11 @@ const updateProduct = async (req, res, next) => {
         for (const key in updateData) {
             if (allowedUpdates.includes(key)) {
                 if (key === 'mainImageUrl' || key === 'additionalImageUrls') {
-                    updatesToApply[key] = updateData[key]; // Assume URL is provided directly
+                    updatesToApply[key] = updateData[key];
                 } else if (key === 'dimensions') {
-                    parseAndUpdate(key); // dimensions might be sent as JSON string
+                    parseAndUpdate(key); 
                 } else if (key === 'price' || key === 'quantityAvailable') {
-                    updatesToApply[key] = parseFloat(updateData[key]); // Ensure numbers
+                    updatesToApply[key] = parseFloat(updateData[key]); 
                 } else if (key === 'inStock') {
                     updatesToApply[key] = typeof updateData[key] === 'boolean' ? updateData[key] : (updateData[key] === 'true');
                 }
@@ -281,9 +323,8 @@ const updateProduct = async (req, res, next) => {
             return next(new ApiError(400, 'No valid fields to update provided.'));
         }
 
-        // Apply updates to the found product document
         Object.assign(productToUpdate, updatesToApply);
-        const updatedProduct = await productToUpdate.save({ validateBeforeSave: true }); // Run validators on save
+        const updatedProduct = await productToUpdate.save({ validateBeforeSave: true }); 
 
         res.status(200).json(
             new ApiResponse(200, updatedProduct, 'Product updated successfully')

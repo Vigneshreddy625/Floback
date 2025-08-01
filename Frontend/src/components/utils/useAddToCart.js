@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, addToCartOptimistic } from "../../redux/Cart/cartSlice";
+import { addItemToCart as addToCart, addItemToCartOptimistic as addToCartOptimistic } from "../../redux/Cart/cartSlice";
 import { toast } from "sonner";
 
 export const useAddToCart = () => {

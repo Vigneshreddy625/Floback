@@ -20,11 +20,12 @@ const collectionSchema = new mongoose.Schema({
         required: true
     },
     thumbnailImageUrl: {
-        type: String
+        type: String,
+        required: true
     },
     priceRange: {
         min: { type: Number },
-        max: { type: Number }
+        max: { type: Number },
     },
     type: {
         type: String,

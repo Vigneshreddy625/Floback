@@ -12,8 +12,8 @@ import {
   updateCartItemOptimistic,
   removeFromCartOptimistic,
   removeFromCart,
-} from "../../redux/Cart/cartSlice"
-import LoadingScreen from "../Items/LoadingScreen";
+} from "../../../redux/Cart/cartSlice"
+import LoadingScreen from "../../Items/LoadingScreen";
 import { createOrder, resetCreateOrderStatus } from "../../redux/Orders/orderSlice"; 
 
 const Cart = () => {

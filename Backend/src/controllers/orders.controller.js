@@ -7,10 +7,6 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import mongoose from 'mongoose';
 import { Cart } from '../models/cart.model.js';
 
-/**
- * Clears items from the user's cart after a successful order.
- * Keeps the cart document and metadata like shipping method, etc.
- */
 export const clearCartForOrder = async (userId) => {
   const cart = await Cart.findOne({ user: userId });
 
@@ -18,10 +14,10 @@ export const clearCartForOrder = async (userId) => {
     throw new Error('Cart not found for user');
   }
 
-  cart.items = []; // Remove all cart items
+  cart.items = [];
   cart.subtotal = 0;
   cart.total = 0;
-  cart.shippingMethod = 'Standard'; // or null depending on your logic
+  cart.shippingMethod = 'Standard'; 
 
   await cart.save();
 };
@@ -294,10 +290,10 @@ export const getAllOrders = async (req, res) => {
         delivered: 'Delivered',
         completed: 'Delivered',
         pending: 'Pending',
-        cancelled: 'Cancelled', // ADDED: Missing mapping
-        shipped: 'Shipped', // ADDED: Missing mapping
-        returned: 'Returned', // ADDED: Missing mapping
-        failed: 'Failed', // ADDED: Missing mapping
+        cancelled: 'Cancelled', 
+        shipped: 'Shipped', 
+        returned: 'Returned', 
+        failed: 'Failed', 
       };
       filter.orderStatus = statusMap[status] || status;
     }
@@ -331,7 +327,7 @@ export const getAllOrders = async (req, res) => {
 
     const orders = await Order.find(filter)
       .populate('user')
-      .populate('items.itemId') // CORRECTED: Use itemId instead of productId
+      .populate('items.itemId') 
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit))

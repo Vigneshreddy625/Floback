@@ -1,61 +1,80 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, Sofa, X } from 'lucide-react';
+import React, {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const navItems = [
+    { name: "Home", href: "/home" },
+    { name: "Shop", href: "/shop" },
+    { name: "Collections", href: "/collections" },
+    { name: "Fabrics", href: "/fabric-collections" },
+    { name: "Contact", href: "/contact" },
+    { name: "Book Demo", href: "/book-demo" },
+  ];
 
 function Header() {
-  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-40 border-b">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Flo<span className="text-yellow-600">riva</span>
-            </h1>
-          </Link>
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-gray-200 transition-all duration-500">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          <div className="flex items-center space-x-3 group cursor-pointer">
+            <div className="relative">
+              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25 group-hover:shadow-yellow-500/50 transition-all duration-300 group-hover:scale-110">
+                <Sofa className="w-7 h-7 text-black" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-pulse"></div>
+            </div>
+            <div onClick={() => navigate("/home")}>
+              <h1 className="text-3xl lg:text-4xl font-black tracking-tight">
+                <span className="text-black">Flo</span>
+                <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">riva</span>
+              </h1>
+              <div className="text-xs text-gray-500 font-medium tracking-wider">LUXURY INTERIORS</div>
+            </div>
+          </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-yellow-600 font-medium transition-colors">Home</Link>
-            <Link to="/shop" className="text-gray-700 hover:text-yellow-600 font-medium transition-colors">Shop</Link>
-            <Link to="/collections" className="text-yellow-600 font-medium">Collections</Link>
-            <Link to="/book-demo" className="text-gray-700 hover:text-yellow-600 font-medium transition-colors">Book a Demo</Link>
-            <Link to="/contact" className="text-gray-700 hover:text-yellow-600 font-medium transition-colors">Contact</Link>
+          <nav className="hidden lg:flex items-center space-x-1">
+            {navItems.map((item, index) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="relative px-4 py-2 text-gray-700 hover:text-yellow-500 font-medium transition-all duration-300 rounded-lg hover:bg-yellow-500/10 group"
+              >
+                {item.name}
+                <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-yellow-400/0 to-orange-500/0 group-hover:from-yellow-400/10 group-hover:to-orange-500/10 transition-all duration-300" />
+              </a>
+            ))}
           </nav>
 
-          {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-gray-700"
-            onClick={() => setMobileMenuOpen(true)}
+            className="lg:hidden p-3 rounded-xl hover:bg-yellow-500/10 transition-all duration-300 border border-yellow-500/20"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            <Menu className="w-6 h-6" />
+            {isMenuOpen ? (
+              <X className="w-6 h-6 text-yellow-400" />
+            ) : (
+              <Menu className="w-6 h-6 text-yellow-400" />
+            )}
           </button>
         </div>
-      </div>
 
-      {/* Slide-in Mobile Menu */}
-      <div className={`fixed inset-0 z-50 bg-black bg-opacity-50 md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setMobileMenuOpen(false)}>
-        <div
-          className={`absolute top-0 left-0 w-64 h-full bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
-            isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
-          onClick={(e) => e.stopPropagation()} // prevent close on click inside menu
-        >
-          <div className="p-4 flex justify-between items-center border-b">
-            <h2 className="text-2xl font-bold text-gray-900">Menu</h2>
-            <button onClick={() => setMobileMenuOpen(false)}>
-              <X className="w-6 h-6 text-gray-700" />
-            </button>
+        {isMenuOpen && (
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-yellow-500/20">
+            <nav className="px-6 py-8 space-y-2">
+              {navItems.map((item, index) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="block py-4 px-6 text-gray-700 hover:text-yellow-500 hover:bg-yellow-500/10 rounded-xl font-medium transition-all duration-300 transform hover:translate-x-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </a>
+              ))}
+            </nav>
           </div>
-          <nav className="flex flex-col p-4 space-y-4">
-            <Link to="/" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 font-medium">Home</Link>
-            <Link to="/shop" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 font-medium">Shop</Link>
-            <Link to="/collections" onClick={() => setMobileMenuOpen(false)} className="text-yellow-600 font-medium">Collections</Link>
-            <Link to="/book-demo" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 font-medium">Book a Demo</Link>
-            <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 font-medium">Contact</Link>
-          </nav>
-        </div>
+        )}
       </div>
     </header>
   );

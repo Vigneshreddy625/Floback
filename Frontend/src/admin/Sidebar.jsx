@@ -23,6 +23,8 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     { icon: BarChart3, name: "Dashboard", path: "dashboard" },
     { icon: Package, name: "Orders", path: "orders" },
     { icon: ShoppingCart, name: "Products", path: "products" },
+    { icon: Users, name: "Fabrics", path: "fabrics" },
+  { icon: Users, name: "Collections", path: "collections" },
     // { icon: Users, name: "Customers", path: "customers" },
     // { icon: FileText, name: "Reports", path: "reports" },
     // { icon: TrendingUp, name: "Statistic", path: "statistic" },

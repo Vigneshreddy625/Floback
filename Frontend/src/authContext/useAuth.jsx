@@ -6,7 +6,7 @@ import LoadingScreen from "../components/Items/LoadingScreen";
 
 const AuthContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_BACKEND_URL
 axios.defaults.baseURL = API_URL;
 
 
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `/api/v1/users/current-user`, {withCredentials: true}
+          `/users/current-user`, {withCredentials: true}
         );
         if (response.data.data) {
           setUser(response.data.data);
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await axios.post(
-        `/api/v1/users/register`,
+        `/users/register`,
         userData,
         {
           withCredentials: true,
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await axios.post(
-        `/api/v1/users/login`,
+        `/users/login`,
         credentials,
         {
           withCredentials: true,
@@ -117,7 +117,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
 
       await axios.post(
-        `/api/v1/users/logout`,
+        `/users/logout`,
         {},
         {
           withCredentials: true,
@@ -135,7 +135,7 @@ export const AuthProvider = ({ children }) => {
   const refreshToken = async () => {
     try {
       const response = await axios.post(
-        `/api/v1/users/refresh-token`,
+        `/users/refresh-token`,
         {},
         { withCredentials: true }
       );
@@ -158,14 +158,12 @@ const deleteUser = async (userId) => {
     setError(null);
 
     await axios.post(
-      `/api/v1/users/delete-user/${userId}`, 
+      `/users/delete-user/${userId}`, 
       {}, 
       {
         withCredentials: true,
       }
     );
-    
-
     setUser(null);
     dispatch(clearUser());
     return true;

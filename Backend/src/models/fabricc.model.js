@@ -2,6 +2,7 @@ import e from "express";
 import mongoose from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { nanoid } from 'nanoid';
+import { type } from "os";
 
 const fabricSchema = new mongoose.Schema({
     fabricId: {
@@ -14,6 +15,14 @@ const fabricSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    collectionName : {
+        type : String,
+        trim : true
+    },
+    type: {
+        type: String,
+        default: 'Fabric',
     },
     collectionId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -50,6 +59,19 @@ const fabricSchema = new mongoose.Schema({
     durability: {
         type: String,
         trim: true
+    },
+    features: [{
+        type: String,
+        trim: true
+    }],
+    inStock: {
+        type: Boolean,
+        default: true,
+        required: true
+    },
+    quantityAvailable: {
+        type: Number,
+        default: 0
     },
 }, { timestamps: true });
 

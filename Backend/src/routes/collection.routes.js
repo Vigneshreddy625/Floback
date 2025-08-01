@@ -8,7 +8,7 @@ import {
   deleteCollection,
   collectionUploadMiddleware
 } from '../controllers/collection.controller.js';
-import { verifyJWT, isAdmin } from '../middlewares/auth.middleware.js';
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 

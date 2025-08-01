@@ -1,9 +1,19 @@
 import React from "react";
-import { Heart, ShoppingBag, Search } from "lucide-react";
+import { Heart, ShoppingBag, Search, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../authContext/useAuth";
 
 const ShopHeader = ({ searchTerm, setSearchTerm, cartCount }) => {
+  const {logout} = useAuth();
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/home");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
   return (
     <header className="bg-white shadow-lg sticky top-0 z-40 border-b">
       <div className="max-w-7xl mx-auto px-4 py-4">
@@ -16,7 +26,7 @@ const ShopHeader = ({ searchTerm, setSearchTerm, cartCount }) => {
 
           <nav className="hidden md:flex space-x-8">
             <Link
-              to="/"
+              to="/home"
               className="text-gray-700 hover:text-yellow-600 font-medium transition-colors"
             >
               Home
@@ -66,6 +76,7 @@ const ShopHeader = ({ searchTerm, setSearchTerm, cartCount }) => {
                 </span>
               )}
             </div>
+            <LogOut onClick={handleLogout}/>
           </div>
         </div>
       </div>

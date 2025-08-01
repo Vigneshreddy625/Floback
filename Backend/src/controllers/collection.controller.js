@@ -59,7 +59,6 @@ const addCollection = async (req, res, next) => {
         const collectionData = req.body;
         let thumbnailImageUrl = null;
 
-        // Parse nested objects
         const parseAndAssign = (key) => {
             if (collectionData[key] && typeof collectionData[key] === 'string') {
                 try {
@@ -151,7 +150,6 @@ const getCollectionById = async (req, res, next) => {
         res.status(200).json(new ApiResponse(200, collection, 'Collection retrieved successfully.'));
     } catch (error) {
         console.error('Error in getCollectionById:', error);
-        next(new ApiError(500, 'Internal server error while retrieving collection.', error));
     }
 };
 
@@ -163,7 +161,7 @@ const getCollectionWithFabrics = async (req, res, next) => {
             return next(new ApiError(400, 'Collection ID is required.'));
         }
 
-        const collection = await Collection.findOne({ collectionId: collectionId });
+        const collection = await Collection.findOne({ _id: collectionId });
 
         if (!collection) {
             return next(new ApiError(404, 'Collection not found.'));
