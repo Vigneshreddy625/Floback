@@ -5,6 +5,7 @@ import ShopHeader from "../shop/ShopHeader"
 import CategoryFilter from '../shop/CategoryFilter';
 import ProductGrid from '../shop/ProductGrid';
 import WhatsAppButton from '../shop/WhatsAppButton';
+import Header from '../Layout/Header';
 
 const Shop = () => {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -34,11 +35,7 @@ const Shop = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <ShopHeader 
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        cartCount={cartCount}
-      />
+      <Header/>
 
       <section className="bg-gradient-to-r from-gray-900 to-gray-700 py-16">
         <div className="max-w-7xl mx-auto px-4 text-center text-white">

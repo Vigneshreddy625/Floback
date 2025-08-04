@@ -42,7 +42,7 @@ export const addItemToCart = async (req, res) => {
 
     const { itemType, itemId, quantity } = req.body;
 
-    if (!userId || !itemType || !itemId || !quantity) {
+    if (!itemType || !itemId || !quantity) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
@@ -110,7 +110,6 @@ export const removeItemFromCart = asyncHandler(async (req, res, next) => {
   }
 
   const { itemId, itemType } = req.params;
-  const { quantityToRemove } = req.body;
 
   if (!itemId || !itemType) {
     throw new ApiError(
@@ -121,13 +120,6 @@ export const removeItemFromCart = asyncHandler(async (req, res, next) => {
 
   if (!isValidObjectId(itemId)) {
     throw new ApiError(400, 'Invalid Item ID format.');
-  }
-
-  if (
-    quantityToRemove !== undefined &&
-    (typeof quantityToRemove !== 'number' || quantityToRemove <= 0)
-  ) {
-    throw new ApiError(400, 'Quantity to remove must be a positive number.');
   }
 
   try {
@@ -143,20 +135,12 @@ export const removeItemFromCart = asyncHandler(async (req, res, next) => {
       throw new ApiError(404, 'Item not found in cart.');
     }
 
-    if (quantityToRemove !== undefined) {
-      cart.items[itemIndex].quantity -= quantityToRemove;
-      if (cart.items[itemIndex].quantity <= 0) {
-        cart.items.splice(itemIndex, 1);
-      }
-    } else {
-      cart.items.splice(itemIndex, 1);
-    }
+    cart.items.splice(itemIndex, 1);
 
     cart.subtotal = cart.items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
-
     cart.tax = cart.subtotal * 0.08;
     cart.shipping = cart.subtotal > 100 ? 0 : 10;
     cart.total = cart.subtotal + cart.tax + cart.shipping;

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -19,65 +20,108 @@ import AddCollection from "./admin/Modals/AddCollection";
 import Admin from "./admin/Layout";
 import AdminProductsList from "./admin/Products";
 import OrdersPage from "./admin/Orders";
-// import AdminCollectionsList from "./admin/Collectons";
 import AdminFabricsList from "./admin/Fabrics";
 import DashboardPage from "./admin/Dashboard";
 import GenericPage from "../../../Revispy/Frontend/src/admin/Generics";
 import AdminCollectionsList from "./admin/Collectons";
 import Login from "./components/Authentication/Login";
 import Signup from "./components/Authentication/Signup";
-import ProtectedRoute from "./components/Items/ProtectedRoute"
+import ProtectedRoute from "./components/Items/ProtectedRoute";
+import Account from "./components/Account/Account";
+import Orders from "./components/Account/Orders";
+import Profile from "./components/Profile/Profile";
+import Addresses from "./components/Profile/Addresses";
+import Delete from "./components/Profile/Delete";
 import { Suspense } from "react";
 import LoadingScreen from "./components/Items/LoadingScreen";
-// import Cart from "./components/pages/Cart/Cart"
+import Cart from "./components/pages/Cart/Cart";
+import MobileAccount from "./components/MobileAccount/Account"
+import MobileDeleteAccount from "./components/MobileAccount/Delete";
+import MobileAddresses from "./components/MobileAccount/Addresses"
+import Details from "./components/MobileAccount/Details"
+import MobileOrders from "./components/MobileAccount/Orders"
 
-const App = () => (
-  <Suspense fallback={<LoadingScreen />}>
-        <Toaster position="top-right" richColors offset={75} />
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/home" element={<Index />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/admin/add-item" element={<AddItem />} />
-          <Route path="/admin/add-fabric" element={<AddFabric />} />
-          <Route path="/admin/add-collection" element={<AddCollection />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/collections" element={<Collections />} />
-          <Route path="/book-demo" element={<BookDemo />} />
-          <Route path="/sofa-collections" element={<SofaCollections />} />
-          <Route path="/fabric-collections" element={<FabricCollections />} />
-          <Route
-            path="/fabric-collection/:collectionId"
-            element={<FabricCollectionDetail />}
-          />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/fabric/:fabricId" element={<FabricDetail />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          {/* <Route path="/cart" element={<Cart/>}/> */}
-          <Route path="*" element={<NotFound />} />
-        </Route>
-        <Route element={<ProtectedRoute />}>
-        <Route path="/admin" element={<Admin />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="orders" element={<OrdersPage />} />
-          <Route path="products" element={<AdminProductsList />} />
-          <Route path="collections" element={<AdminCollectionsList />} />
-          <Route path="fabrics" element={<AdminFabricsList />} />
-          <Route path="customers" element={<GenericPage />} />
-          <Route path="reports" element={<GenericPage />} />
-          <Route path="statistic" element={<GenericPage />} />
-          <Route path="notification" element={<GenericPage />} />
-          <Route path="help" element={<GenericPage />} />
-          <Route path="settings" element={<GenericPage />} />
-        </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+function App() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <Toaster position="top-right" richColors offset={75} />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/home" element={<Index />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/admin/add-item" element={<AddItem />} />
+            <Route path="/admin/add-fabric" element={<AddFabric />} />
+            <Route path="/admin/add-collection" element={<AddCollection />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/collections" element={<Collections />} />
+            <Route path="/book-demo" element={<BookDemo />} />
+            <Route path="/sofa-collections" element={<SofaCollections />} />
+            <Route path="/fabric-collections" element={<FabricCollections />} />
+            <Route
+              path="/fabric-collection/:collectionId"
+              element={<FabricCollectionDetail />}
+            />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/fabric/:fabricId" element={<FabricDetail />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            {!isMobile && (
+              <Route path="account" element={<Account />}>
+                <Route path="overview" element={<div>Overview</div>} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="savedcards" element={<div>Saved Cards</div>} />
+                <Route path="addresses" element={<Addresses />} />
+                <Route path="delete" element={<Delete />} />
+              </Route>
+            )}
+            {isMobile && (
+              <>
+                <Route path="account" element={<MobileAccount />} />
+                <Route path="orders" element={<MobileOrders />} />
+                <Route path="account/details" element={<Details />} />
+                <Route path="account/addresses" element={<MobileAddresses />} />
+                <Route path="account/delete" element={<MobileDeleteAccount />} />
+              </>
+            )}
+            <Route path="/cart" element={<Cart />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/admin" element={<Admin />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="products" element={<AdminProductsList />} />
+              <Route path="collections" element={<AdminCollectionsList />} />
+              <Route path="fabrics" element={<AdminFabricsList />} />
+              <Route path="customers" element={<GenericPage />} />
+              <Route path="reports" element={<GenericPage />} />
+              <Route path="statistic" element={<GenericPage />} />
+              <Route path="notification" element={<GenericPage />} />
+              <Route path="help" element={<GenericPage />} />
+              <Route path="settings" element={<GenericPage />} />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </Suspense>
-);
+  );
+}
 
 export default App;

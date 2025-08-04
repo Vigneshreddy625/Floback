@@ -27,24 +27,24 @@ const FabricCollections = () => {
             <span className="text-sm font-medium text-gray-700">Premium Collection 2024</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black text-gray-800 mb-6 font-serif leading-tight">
+          <h1 className="text-3xl sm:text-7xl font-black text-gray-800 mb-6 font-serif leading-tight">
             Exquisite Fabric<br />
-            <span className="text-4xl md:text-6xl text-amber-600">Collections</span>
+            <span className="text-3xl sm:text-6xl text-amber-600">Collections</span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
             Transform your space with our meticulously curated premium fabrics.
             Every thread tells a story of luxury, comfort, and timeless elegance.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 mb-6 md:mb-12">
+          <div className="hidden md:flex flex-wrap justify-center items-center gap-6 mb-6 ">
             <div className="flex items-center bg-white px-6 py-3 rounded-full shadow border border-gray-200">
               <Award className="w-5 h-5 text-amber-500 mr-3" />
               <span className="text-gray-700 font-medium">Premium Quality</span>
             </div>
             <div className="flex items-center bg-white px-6 py-3 rounded-full shadow border border-gray-200">
               <Palette className="w-5 h-5 text-amber-400 mr-3" />
-              <span className="text-gray-700 font-medium">Endless Variety</span>
+              <span className="text-xs text-gray-700 font-medium">Endless Variety</span>
             </div>
             <div className="flex items-center bg-white px-6 py-3 rounded-full shadow border border-gray-200">
               <Sparkles className="w-5 h-5 text-amber-300 mr-3" />

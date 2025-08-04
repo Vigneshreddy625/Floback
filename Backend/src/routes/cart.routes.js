@@ -15,7 +15,7 @@ router.use(verifyJWT);
 
 router.route("/").get(verifyJWT, getUserCart);
 router.route("/add").post(verifyJWT,addItemToCart);
-router.route("/remove/:productId").delete(verifyJWT, removeItemFromCart);
+router.route("/remove/:itemId/:itemType").delete(verifyJWT, removeItemFromCart);
 router.route("/clear").delete(verifyJWT, clearCart);
 
 export default router;

@@ -34,29 +34,152 @@ export const placeOrder = async (req, res) => {
     shippingAddress: clientShippingAddress,
   } = req.body;
 
-  if (
-    !user ||
-    !items ||
-    items.length === 0 ||
-    subtotal === undefined ||
-    tax === undefined ||
-    total === undefined ||
-    shipping === undefined ||
-    !clientShippingAddress ||
-    !clientShippingAddress.name ||
-    !clientShippingAddress.mobile ||
-    !clientShippingAddress.locality ||
-    !clientShippingAddress.street ||
-    !clientShippingAddress.city ||
-    !clientShippingAddress.district ||
-    !clientShippingAddress.state ||
-    !clientShippingAddress.country ||
-    !clientShippingAddress.postalCode
-  ) {
-    return res.status(400).json({
-      message: 'Missing required order details or shipping address fields.',
+  // Validation errors array to collect all missing fields
+  const validationErrors = [];
+
+  // Validate main order fields
+  if (!user) {
+    validationErrors.push({
+      field: 'user',
+      message: 'User information is required'
     });
   }
+
+  if (!items) {
+    validationErrors.push({
+      field: 'items',
+      message: 'Items array is required'
+    });
+  } else if (items.length === 0) {
+    validationErrors.push({
+      field: 'items',
+      message: 'At least one item is required in the order'
+    });
+  }
+
+  if (subtotal === undefined || subtotal === null) {
+    validationErrors.push({
+      field: 'subtotal',
+      message: 'Subtotal is required'
+    });
+  }
+
+  if (tax === undefined || tax === null) {
+    validationErrors.push({
+      field: 'tax',
+      message: 'Tax amount is required'
+    });
+  }
+
+  if (total === undefined || total === null) {
+    validationErrors.push({
+      field: 'total',
+      message: 'Total amount is required'
+    });
+  }
+
+  if (shipping === undefined || shipping === null) {
+    validationErrors.push({
+      field: 'shipping',
+      message: 'Shipping cost is required'
+    });
+  }
+
+  // Validate shipping address
+  // if (!clientShippingAddress) {
+  //   validationErrors.push({
+  //     field: 'shippingAddress',
+  //     message: 'Shipping address is required'
+  //   });
+  // } else {
+  //   // Validate individual shipping address fields
+  //   const shippingFields = [
+  //     { key: 'name', message: 'Recipient name is required' },
+  //     { key: 'mobile', message: 'Mobile number is required' },
+  //     { key: 'locality', message: 'Locality is required' },
+  //     { key: 'street', message: 'Street address is required' },
+  //     { key: 'city', message: 'City is required' },
+  //     { key: 'district', message: 'District is required' },
+  //     { key: 'state', message: 'State is required' },
+  //     { key: 'country', message: 'Country is required' },
+  //     { key: 'postalCode', message: 'Postal code is required' }
+  //   ];
+
+  //   shippingFields.forEach(({ key, message }) => {
+  //     const value = clientShippingAddress[key];
+  //     const isEmpty = !value || 
+  //       (typeof value === 'string' && value.trim() === '') ||
+  //       (typeof value === 'number' && isNaN(value)) ||
+  //       value === null ||
+  //       value === undefined;
+        
+  //     if (isEmpty) {
+  //       validationErrors.push({
+  //         field: `shippingAddress.${key}`,
+  //         message: message
+  //       });
+  //     }
+  //   });
+  // }
+
+  // // Additional validation for items array structure (if items exist)
+  // if (items && items.length > 0) {
+  //   items.forEach((item, index) => {
+  //     const requiredItemFields = [
+  //       { key: 'itemType', message: 'Item type is required' },
+  //       { key: 'itemId', message: 'Item ID is required' },
+  //       { key: 'quantity', message: 'Quantity is required' },
+  //       { key: 'price', message: 'Price is required' },
+  //       { key: 'title', message: 'Item title is required' }
+  //     ];
+
+  //     requiredItemFields.forEach(({ key, message }) => {
+  //       if (!item[key] || (typeof item[key] === 'string' && item[key].trim() === '')) {
+  //         validationErrors.push({
+  //           field: `items[${index}].${key}`,
+  //           message: `${message} for item ${index + 1}`
+  //         });
+  //       }
+  //     });
+
+  //     // Validate numeric fields
+  //     if (item.quantity !== undefined && (isNaN(item.quantity) || item.quantity <= 0)) {
+  //       validationErrors.push({
+  //         field: `items[${index}].quantity`,
+  //         message: `Quantity must be a positive number for item ${index + 1}`
+  //       });
+  //     }
+
+  //     if (item.price !== undefined && (isNaN(item.price) || item.price < 0)) {
+  //       validationErrors.push({
+  //         field: `items[${index}].price`,
+  //         message: `Price must be a valid number for item ${index + 1}`
+  //       });
+  //     }
+  //   });
+  // }
+
+  // // Validate numeric fields
+  // const numericFields = ['subtotal', 'tax', 'total', 'shipping'];
+  // numericFields.forEach(field => {
+  //   const value = req.body[field];
+  //   if (value !== undefined && value !== null && (isNaN(value) || value < 0)) {
+  //     validationErrors.push({
+  //       field: field,
+  //       message: `${field.charAt(0).toUpperCase() + field.slice(1)} must be a valid positive number`
+  //     });
+  //   }
+  // });
+
+  // // If there are validation errors, return them
+  // if (validationErrors.length > 0) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: 'Validation failed',
+  //     errors: validationErrors,
+  //     totalErrors: validationErrors.length
+  //   });
+  // }
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -108,18 +231,24 @@ export const placeOrder = async (req, res) => {
     console.error('Error placing order:', error);
 
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ message: error.message });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Database validation error',
+        error: error.message 
+      });
     }
 
     if (error.code === 11000) {
-      return res
-        .status(409)
-        .json({ message: 'Order ID collision, please try again.' });
+      return res.status(409).json({ 
+        success: false,
+        message: 'Order ID collision, please try again.' 
+      });
     }
 
-    res
-      .status(500)
-      .json({ message: 'Failed to place order. Please try again later.' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to place order. Please try again later.' 
+    });
   }
 };
 

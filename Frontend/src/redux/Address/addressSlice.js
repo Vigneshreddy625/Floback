@@ -13,7 +13,7 @@ export const fetchAddresses = createAsyncThunk(
     const { user } = getState().auth;
     const token = getToken(user);
     try {
-      const response = await axios.get(`/api/v1/addresses/`, {
+      const response = await axios.get(`/addresses/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -31,7 +31,7 @@ export const addAddress = createAsyncThunk(
     const { user } = getState().auth;
     const token = getToken(user);
     try {
-      const response = await axios.post(`/api/v1/addresses/`, addressData, {
+      const response = await axios.post(`/addresses/`, addressData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -50,7 +50,7 @@ export const updateAddress = createAsyncThunk(
     const token = getToken(user);
     try {
       const response = await axios.put(
-        `/api/v1/addresses/${addressId}`,
+        `/addresses/${addressId}`,
         addressData,
         {
           headers: {
@@ -71,7 +71,7 @@ export const deleteAddress = createAsyncThunk(
     const { user } = getState().auth;
     const token = getToken(user);
     try {
-      await axios.delete(`/api/v1/addresses/${addressId}`, {
+      await axios.delete(`/addresses/${addressId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

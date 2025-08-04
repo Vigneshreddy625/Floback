@@ -2,10 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "sonner";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+const API_URL = "http://localhost:8000/api/v1";
 axios.defaults.baseURL = API_URL;
-axios.defaults.withCredentials = true;
-
 
 export const addItemToCart = createAsyncThunk(
   "cart/addItemToCart",
@@ -50,11 +48,9 @@ export const updateCartItemQuantity = createAsyncThunk(
 
 export const removeItemFromCart = createAsyncThunk(
   "cart/removeItemFromCart",
-  async ({ itemId, itemType, quantityToRemove }, { rejectWithValue }) => {
+  async ({ itemId, itemType }, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(`/cart/remove/${itemId}/${itemType}`, {
-        data: { quantityToRemove }, 
-      });
+      const response = await axios.delete(`/cart/remove/${itemId}/${itemType}`);
       toast.success(response.data.message || "Item removed from cart!");
       return response.data;
     } catch (err) {
@@ -66,7 +62,6 @@ export const removeItemFromCart = createAsyncThunk(
   }
 );
 
-
 export const fetchUserCart = createAsyncThunk(
   "cart/fetchUserCart",
   async (_, { rejectWithValue }) => {
@@ -74,14 +69,12 @@ export const fetchUserCart = createAsyncThunk(
       const response = await axios.get(`/cart`);
       return response.data;
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to fetch cart.";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(
+        err.response?.data?.message || "Fetch cart failed"
+      );
     }
   }
 );
-
 
 export const clearUserCart = createAsyncThunk(
   "cart/clearUserCart",
@@ -135,7 +128,7 @@ const cartSlice = createSlice({
       })
       .addCase(fetchUserCart.fulfilled, (state, action) => {
         state.loading.fetch = false;
-        state.cart = action.payload.data;
+        state.cart = action.payload.data || action.payload;
         state.error = null;
       })
       .addCase(fetchUserCart.rejected, (state, action) => {
@@ -164,7 +157,7 @@ const cartSlice = createSlice({
       })
       .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
         state.loading.update = false;
-        state.cart = action.payload.cart;
+        state.cart = action.payload.data || action.payload.cart;
         state.error = null;
       })
       .addCase(updateCartItemQuantity.rejected, (state, action) => {
@@ -178,7 +171,7 @@ const cartSlice = createSlice({
       })
       .addCase(removeItemFromCart.fulfilled, (state, action) => {
         state.loading.remove = false;
-        state.cart = action.payload.cart;
+        state.cart = action.payload.data || action.payload.cart;
         state.error = null;
       })
       .addCase(removeItemFromCart.rejected, (state, action) => {
@@ -192,7 +185,7 @@ const cartSlice = createSlice({
       })
       .addCase(clearUserCart.fulfilled, (state, action) => {
         state.loading.clear = false;
-        state.cart = action.payload.cart;
+        state.cart = action.payload.data || action.payload.cart;
         state.error = null;
       })
       .addCase(clearUserCart.rejected, (state, action) => {
@@ -202,11 +195,7 @@ const cartSlice = createSlice({
   },
 });
 
-export const {
-  resetCartState,
-  adddItemToCart,
-  addItemToCartOptimistic, 
-} = cartSlice.actions;
+export const { resetCartState } = cartSlice.actions; 
 
 export default cartSlice.reducer;
 

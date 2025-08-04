@@ -14,18 +14,18 @@ const AddressList = ({ addresses, onSelectAddress, selectedAddressId }) => {
             className={`mb-4 transition-all duration-200 `}
             onClick={() => onSelectAddress(address)}
           >
-            <div className="relative border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm hover:shadow-md cursor-pointer">
+            <div className="relative border border-gray-200 rounded-xl shadow-sm hover:shadow-md cursor-pointer">
               <div className="flex flex-col md:flex-row justify-between px-4 py-3">
                 <div className="space-y-2 pr-20 md:pr-0">
                   <div className="flex items-center gap-2">
-                    <User size={16} className="text-gray-600 dark:text-gray-400" />
+                    <User size={16} className="text-gray-600" />
                     <p className="font-semibold text-base">{address.name}</p>
                   </div>
 
                   <div className="flex items-start gap-2">
                     <Navigation
                       size={16}
-                      className="text-gray-600 dark:text-gray-400 mt-1 flex-shrink-0"
+                      className="text-gray-600 mt-1 flex-shrink-0"
                     />
                     <div className="space-y-1">
                       <p className="text-sm">{address.street}</p>
@@ -36,7 +36,7 @@ const AddressList = ({ addresses, onSelectAddress, selectedAddressId }) => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Phone size={16} className="text-gray-600 dark:text-gray-400 flex-shrink-0" />
+                    <Phone size={16} className="text-gray-600 flex-shrink-0" />
                     <p className="text-sm">{address.mobile}</p>
                   </div>
                 </div>
@@ -45,8 +45,8 @@ const AddressList = ({ addresses, onSelectAddress, selectedAddressId }) => {
                   <span
                     className={`text-xs px-3 py-1 rounded-full border flex items-center gap-1 font-medium ${
                       isHome
-                        ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                        : 'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+                        ? 'border-blue-200 bg-blue-50 text-blue-700'
+                        : 'border-purple-200 bg-purple-50 text-purple-700'
                     }`}
                   >
                     {isHome ? (

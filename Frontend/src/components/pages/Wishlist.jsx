@@ -3,7 +3,7 @@ import { useWishlist } from "../../wishlistContext/useWishlist";
 import { Button } from "../ui/button";
 import LoadingScreen from "../Items/LoadingScreen";
 import { useNavigate } from "react-router-dom";
-import { useAddToCart } from "../utils/useAddToCart"
+// import { useAddToCart } from "../utils/useAddToCart"
 import Header from "../Layout/Header";
 import { useDispatch } from "react-redux";
 
@@ -32,10 +32,10 @@ const Wishlist = () => {
     loading: wishlistLoading,
     removeWishlistItem,
   } = useWishlist();
-  const {
-    handleAddToCart,
-    loading: addToCartLoading,
-  } = useAddToCart();
+  // const {
+  //   handleAddToCart,
+  //   loading: addToCartLoading,
+  // } = useAddToCart();
 
   useEffect
 
@@ -62,7 +62,7 @@ const Wishlist = () => {
   return (
     <div className="w-full lg:min-w-[1024px]">
       <Header/>
-      <div className="max-w-6xl mx-auto py-4">
+      <div className="max-w-6xl mx-auto px-2 py-4 sm:p-4">
       <div className="flex items-center justify-between mb-8">
         <div className="flex w-full md:justify-normal">
           <h1 className="text-xl font-medium">My Wishlist</h1>
@@ -73,7 +73,7 @@ const Wishlist = () => {
       </div>
 
       {wishlistItems.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
           {wishlistItems.map((item, index) => (
             <div
               key={index}
@@ -127,7 +127,7 @@ const Wishlist = () => {
                 </div>
                 <button
                   onClick={() => toggleWishlist({ itemId: item.itemId._id, itemType: item.itemType, ...item })}
-                  disabled={addToCartLoading}
+                  // disabled={addToCartLoading}
                   className={`md:mt-2 py-2 w-full border-t dark:border-gray-600 text-sm font-medium ${
                     item.stockStatus === "In Stock"
                       ? "text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900"
