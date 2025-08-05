@@ -143,7 +143,7 @@ function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() => navigate("/account/profile")}
+                  onClick={() => navigate("/account")}
                 >
                   <User className="h-4 w-4 mr-2" />
                   Account
