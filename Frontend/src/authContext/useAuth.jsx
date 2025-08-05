@@ -115,11 +115,9 @@ export const AuthProvider = ({ children }) => {
       console.log("✅ Full update response:", response);
       console.log("✅ Response data:", response.data);
       
-      // Your backend returns user data in response.data.user
       const updatedUser = response.data.user;
       console.log("📦 Found user in response.data.user:", updatedUser);
       
-      // Update both states with the user data from your backend
       if (updatedUser && updatedUser.email) {
         setUser(updatedUser);
         dispatch(addUser(updatedUser));
@@ -134,7 +132,6 @@ export const AuthProvider = ({ children }) => {
       console.error("❌ Update user details error:", err);
       console.error("❌ Error response:", err.response?.data);
       
-      // Don't clear user on update failure unless it's an auth error
       if (err.response?.status === 401) {
         console.log("🚫 Auth error during update, clearing user");
         setUser(null);

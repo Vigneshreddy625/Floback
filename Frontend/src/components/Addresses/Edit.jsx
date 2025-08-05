@@ -87,23 +87,23 @@ const Edit = ({ isOpen, onClose, addressId, addressData }) => {
     }
   };
 
-useEffect(() => {
-  if (addressData) {
-    setFormData({
-      name: addressData.name || "",
-      mobile: addressData.mobile || "",
-      houseNo: addressData.houseNo || "",
-      postalCode: addressData.postalCode || "",
-      state: addressData.state || "",
-      street: addressData.street || "",
-      city: addressData.city || "",
-      locality: addressData.locality || "",
-      district: addressData.district || "",
-      country: addressData.country || "India",
-      type: addressData.type || "home",
-    });
-  }
-}, [addressData]);
+  useEffect(() => {
+    if (addressData) {
+      setFormData({
+        name: addressData.name || "",
+        mobile: addressData.mobile || "",
+        houseNo: addressData.houseNo || "",
+        postalCode: addressData.postalCode || "",
+        state: addressData.state || "",
+        street: addressData.street || "",
+        city: addressData.city || "",
+        locality: addressData.locality || "",
+        district: addressData.district || "",
+        country: addressData.country || "India",
+        type: addressData.type || "home",
+      });
+    }
+  }, [addressData]);
 
   useEffect(() => {
     if (isOpen) {
@@ -145,7 +145,6 @@ useEffect(() => {
     }
   }, [addressUpdateLoading, addressUpdateError, onClose, isOpen]);
 
-
   if (!isOpen) return null;
 
   return (
@@ -153,16 +152,16 @@ useEffect(() => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4 backdrop-blur-md bg-black/40 overflow-y-auto"
+      className="fixed inset-0 z-50 md:flex md:items-center md:justify-center md:p-4 md:backdrop-blur-md md:bg-black/40"
     >
       <motion.div
         ref={popupRef}
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        className="w-full md:max-w-xl h-full md:h-auto max-h-full md:max-h-[90vh] bg-white md:rounded-2xl shadow-lg overflow-hidden border flex flex-col"
+        className="w-full h-screen md:h-auto md:max-w-xl md:max-h-[90vh] bg-white md:rounded-2xl shadow-lg overflow-hidden border flex flex-col"
       >
-        <div className="relative h-14 bg-gradient-to-r from-pink-500 to-purple-600 flex-shrink-0">
+        <div className="relative h-16 bg-gradient-to-r from-pink-500 to-purple-600 flex-shrink-0">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
@@ -177,273 +176,274 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="p-4 sm:p-6 pt-10 sm:pt-12 overflow-y-auto flex-grow">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 sm:mb-6">
-            Edit Delivery Address
-          </h2>
-
-          <div className="space-y-4 sm:space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="mt-1 flex-shrink-0">
-                  <User className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <label className="text-xs sm:text-sm text-gray-500">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full p-2 mt-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm"
-                    placeholder="Enter Full Name"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="mt-1 flex-shrink-0">
-                  <Phone className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <label className="text-xs sm:text-sm text-gray-500">
-                    Mobile Number
-                  </label>
-                  <input
-                    type="tel"
-                    name="mobile"
-                    value={formData.mobile}
-                    onChange={handleInputChange}
-                    className="w-full p-2 mt-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500focus:border-transparent transition-all text-sm"
-                    placeholder="Enter Mobile Number"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-2 sm:space-x-3">
-              <div className="mt-1 flex-shrink-0">
-                <Home className="w-5 h-5 text-gray-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <label className="text-xs sm:text-sm text-gray-500">
-                  Street Address
-                </label>
-                <textarea
-                  name="street"
-                  value={formData.street}
-                  onChange={handleInputChange}
-                  rows={2}
-                  className="w-full p-2 mt-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm"
-                  placeholder="Enter Street Address"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="mt-1 flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <label className="text-xs sm:text-sm text-gray-500">
-                    Pincode
-                  </label>
-                  <input
-                    type="text"
-                    name="postalCode"
-                    value={formData.postalCode}
-                    onChange={handleInputChange}
-                    className="w-full p-2 mt-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm"
-                    placeholder="Enter Pincode"
-                    maxLength={6}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="mt-1 flex-shrink-0">
-                  <Map className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <label className="text-xs sm:text-sm text-gray-500">
-                    Locality
-                  </label>
-                  {loading ? (
-                    <div className="w-full h-6 mt-1 bg-gray-200 animate-pulse rounded" />
-                  ) : (
-                    <input
-                      type="text"
-                      name="locality"
-                      value={formData.locality}
-                      onChange={handleInputChange}
-                      className="w-full p-2 mt-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm"
-                      placeholder="Enter House/Flat No."
-                      required
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="mt-1 flex-shrink-0">
-                  <Building className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <label className="text-xs sm:text-sm text-gray-5000">
-                    City
-                  </label>
-                  {loading ? (
-                    <div className="w-full h-6 mt-1 bg-gray-200 animate-pulse rounded" />
-                  ) : (
-                    <input
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="w-full p-2 mt-1 bg-gray-50border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm"
-                      placeholder="Enter City"
-                      required
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="mt-1 flex-shrink-0">
-                  <Building className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <label className="text-xs sm:text-sm text-gray-500">
-                    District
-                  </label>
-                  {loading ? (
-                    <div className="w-full h-6 mt-1 bg-gray-200 animate-pulse rounded" />
-                  ) : (
-                    <input
-                      type="text"
-                      name="district"
-                      value={formData.district}
-                      onChange={handleInputChange}
-                      className="w-full p-2 mt-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm"
-                      placeholder="Enter City/District"
-                      required
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="mt-1 flex-shrink-0">
-                  <Map className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <label className="text-xs sm:text-sm text-gray-500">
-                    State
-                  </label>
-                  {loading ? (
-                    <div className="w-full h-6 mt-1 bg-gray-200 animate-pulse rounded" />
-                  ) : (
-                    <input
-                      type="text"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleInputChange}
-                      className="w-full p-2 mt-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm"
-                      placeholder="Enter State"
-                      required
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="mt-1 flex-shrink-0">
-                  <Map className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <label className="text-xs sm:text-sm text-gray-500">
-                    Country
-                  </label>
-                  {loading ? (
-                    <div className="w-full h-6 mt-1 bg-gray-200 animate-pulse rounded" />
-                  ) : (
-                    <select
-                      name="country"
-                      value={formData.country}
-                      onChange={handleInputChange}
-                      className="w-full p-2 mt-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm appearance-none bg-no-repeat bg-right"
-                      style={{
-                        backgroundImage:
-                          "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E\")",
-                        backgroundSize: "20px",
-                      }}
-                      required
-                    >
-                      <option value="India">
-                        India
-                      </option>
-                      <option value="United States">
-                        United States
-                      </option>
-                      <option value="Canada">
-                        Canada
-                      </option>
-                      <option value="United Kingdom">
-                        United Kingdom
-                      </option>
-                      <option value="Australia">
-                        Australia
-                      </option>
-                      <option value="Germany">
-                        Germany
-                      </option>
-                      <option value="France">
-                        France
-                      </option>
-                      <option value="Japan">
-                        Japan
-                      </option>
-                    </select>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center pt-1">
-              <input
-                type="checkbox"
-                id="isHome"
-                name="isHome"
-                checked={formData.type === "home"}
-                onChange={handleInputChange}
-                className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="isHome"
-                className="ml-3 block text-sm text-gray-700"
-              >
-                Set as home address
-              </label>
-            </div>
+        <div className="flex flex-col flex-grow overflow-hidden">
+          <div className="px-4 md:px-6 pt-8 md:pt-10 pb-4 flex-shrink-0">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+              Edit Address
+            </h2>
           </div>
-        </div>
-
-        <div className="p-3 sm:p-4 bg-gray-50">
-          <button
-            className="w-full xs:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white rounded-lg transform transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 order-1 xs:order-2"
-            onClick={handleSubmit}
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col flex-grow overflow-hidden"
           >
-            Save Changes
-          </button>
+            <div className="px-4 md:px-6 overflow-y-auto flex-grow">
+              <div className="space-y-4 md:space-y-6 pb-4">
+                {/* Name and Mobile */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="mt-1 flex-shrink-0">
+                      <User className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm text-gray-500 mb-1">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-base"
+                        placeholder="Enter Full Name"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3">
+                    <div className="mt-1 flex-shrink-0">
+                      <Phone className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm text-gray-500 mb-1">
+                        Mobile Number
+                      </label>
+                      <input
+                        type="tel"
+                        name="mobile"
+                        value={formData.mobile}
+                        onChange={handleInputChange}
+                        className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-base"
+                        placeholder="Enter Mobile Number"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Street Address */}
+                <div className="flex items-start space-x-3">
+                  <div className="mt-1 flex-shrink-0">
+                    <Home className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-sm text-gray-500 mb-1">
+                      Street Address
+                    </label>
+                    <textarea
+                      name="street"
+                      value={formData.street}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-base resize-none"
+                      placeholder="Enter Street Address"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Pincode and Locality */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="mt-1 flex-shrink-0">
+                      <MapPin className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm text-gray-500 mb-1">
+                        Pincode
+                      </label>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={handleInputChange}
+                        className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-base"
+                        placeholder="Enter Pincode"
+                        maxLength={6}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3">
+                    <div className="mt-1 flex-shrink-0">
+                      <Map className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm text-gray-500 mb-1">
+                        Locality
+                      </label>
+                      {loading ? (
+                        <div className="w-full h-12 bg-gray-200 animate-pulse rounded-lg" />
+                      ) : (
+                        <input
+                          type="text"
+                          name="locality"
+                          value={formData.locality}
+                          onChange={handleInputChange}
+                          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-base"
+                          placeholder="Enter Locality"
+                          required
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* City and District */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="mt-1 flex-shrink-0">
+                      <Building className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm text-gray-500 mb-1">
+                        City
+                      </label>
+                      {loading ? (
+                        <div className="w-full h-12 bg-gray-200 animate-pulse rounded-lg" />
+                      ) : (
+                        <input
+                          type="text"
+                          name="city"
+                          value={formData.city}
+                          onChange={handleInputChange}
+                          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-base"
+                          placeholder="Enter City"
+                          required
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3">
+                    <div className="mt-1 flex-shrink-0">
+                      <Building className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm text-gray-500 mb-1">
+                        District
+                      </label>
+                      {loading ? (
+                        <div className="w-full h-12 bg-gray-200 animate-pulse rounded-lg" />
+                      ) : (
+                        <input
+                          type="text"
+                          name="district"
+                          value={formData.district}
+                          onChange={handleInputChange}
+                          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-base"
+                          placeholder="Enter District"
+                          required
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* State and Country */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="mt-1 flex-shrink-0">
+                      <Map className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm text-gray-500 mb-1">
+                        State
+                      </label>
+                      {loading ? (
+                        <div className="w-full h-12 bg-gray-200 animate-pulse rounded-lg" />
+                      ) : (
+                        <input
+                          type="text"
+                          name="state"
+                          value={formData.state}
+                          onChange={handleInputChange}
+                          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-base"
+                          placeholder="Enter State"
+                          required
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3">
+                    <div className="mt-1 flex-shrink-0">
+                      <Map className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm text-gray-500 mb-1">
+                        Country
+                      </label>
+                      {loading ? (
+                        <div className="w-full h-12 bg-gray-200 animate-pulse rounded-lg" />
+                      ) : (
+                        <select
+                          name="country"
+                          value={formData.country}
+                          onChange={handleInputChange}
+                          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-base appearance-none bg-no-repeat bg-right"
+                          style={{
+                            backgroundImage:
+                              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E\")",
+                            backgroundSize: "20px",
+                          }}
+                          required
+                        >
+                          <option value="India">India</option>
+                          <option value="United States">United States</option>
+                          <option value="Canada">Canada</option>
+                          <option value="United Kingdom">United Kingdom</option>
+                          <option value="Australia">Australia</option>
+                          <option value="Germany">Germany</option>
+                          <option value="France">France</option>
+                          <option value="Japan">Japan</option>
+                        </select>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Home Address Checkbox */}
+                <div className="flex items-center pt-2">
+                  <input
+                    type="checkbox"
+                    id="isHome"
+                    name="isHome"
+                    checked={formData.type === "home"}
+                    onChange={handleInputChange}
+                    className="h-5 w-5 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                  />
+                  <label
+                    htmlFor="isHome"
+                    className="ml-3 block text-base text-gray-700"
+                  >
+                    Set as home address
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Fixed Bottom Button */}
+            <div className="p-4 md:p-6 bg-gray-50 border-t border-gray-100 flex-shrink-0">
+              <button
+                type="submit"
+                className="w-full px-6 py-4 text-base font-medium bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-600 hover:to-indigo-700 text-white rounded-lg transform transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+              >
+                Save Address
+              </button>
+            </div>
+          </form>
         </div>
       </motion.div>
     </motion.div>
