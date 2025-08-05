@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { toast } from 'sonner';
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const WishlistContext = createContext();
 

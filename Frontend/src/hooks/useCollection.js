@@ -1,7 +1,7 @@
 // hooks/useCollections.js
 import { useState, useEffect } from 'react';
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 
 const useCollections = () => {
