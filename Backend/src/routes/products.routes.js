@@ -10,6 +10,8 @@ import { upload } from '../middlewares/multer.middleware.js';
 
 const router = Router();
 
+// These are product routes
+
 router.route('/add').post(
   upload.fields([
     { name: 'mainImage', maxCount: 1 }, 
