@@ -17,7 +17,6 @@ import {
 } from "../../redux/Collections/collectionSlice";
 import { useWishlistActions } from "../../hooks/wishlistHooks";
 import { cartHooks } from "../../hooks/CartHooks";
-import { addItemToCart } from "../../redux/Cart/cartSlice";
 import { fetchUserCart } from "../../redux/Cart/cartSlice";
 
 const FabricCollectionDetail = () => {

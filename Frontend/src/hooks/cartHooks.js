@@ -1,4 +1,3 @@
-// hooks/useCartActions.js
 import { useDispatch, useSelector } from "react-redux";
 import { addItemToCart } from "../redux/Cart/cartSlice";
 
@@ -13,7 +12,6 @@ export function cartHooks() {
     console.log("item.itemType:", item.type);
     console.log("Current cart items:", cartItems);
 
-    // Validate required fields before dispatching
     if (!item._id) {
       console.error("Missing item._id");
       return;
@@ -24,16 +22,12 @@ export function cartHooks() {
       return;
     }
 
-    // Ensure itemType is exactly 'Product' or 'Fabric'
     let itemType = item.type;
     
-    // Handle different possible formats
     if (typeof itemType === 'string') {
-      // Capitalize first letter, make rest lowercase
       itemType = itemType.charAt(0).toUpperCase() + itemType.slice(1).toLowerCase();
     }
 
-    // Validate itemType
     if (!['Product', 'Fabric'].includes(itemType)) {
       console.error(`Invalid itemType: "${itemType}". Must be "Product" or "Fabric"`);
       return;
