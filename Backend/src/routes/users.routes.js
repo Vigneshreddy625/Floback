@@ -6,6 +6,7 @@ import {
   getCurrentUser,
   refreshAccessToken,
   deleteUser,
+  userDetails,
 } from '../controllers/user.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { authRateLimit } from '../middlewares/rateLimiting.middleware.js';
@@ -15,7 +16,7 @@ const router = Router();
 router.route("/register").post(authRateLimit, registerUser);
 router.route("/login").post(authRateLimit, loginUser);
 router.route("/refresh-token").post(refreshAccessToken);
-
+router.route("/update-details").patch(verifyJWT, userDetails);
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/delete-account").delete(verifyJWT, deleteUser);

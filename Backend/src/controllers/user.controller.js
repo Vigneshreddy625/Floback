@@ -111,6 +111,47 @@ const loginUser = async (req, res) => {
     );
 };
 
+const userDetails = async (req, res) => {
+  const userId = req.user?._id;
+
+  if (!userId) {
+    throw new ApiError(401, 'Unauthorized request');
+  }
+
+  const { hintName, mobile, alternateMobile, dob, gender } = req.body;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  if (gender !== undefined) user.gender = gender;
+  if (hintName !== undefined) user.hintName = hintName;
+  if (mobile !== undefined) user.mobile = mobile;
+  if (alternateMobile !== undefined) user.alternateMobile = alternateMobile;
+  if (dob !== undefined) user.dob = dob;
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'User details updated successfully',
+    user: {
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      gender: user.gender,
+      mobile: user.mobile,
+      alternateMobile: user.alternateMobile,
+      hintName: user.hintName,
+      dob: user.dob,
+      gender: user.gender,
+      role: user.role,
+      isVerified: user.isVerified,
+    },
+  });
+};
+
 const getCurrentUser = async (req, res) => {
   if (!req.user) {
     return res
@@ -122,7 +163,6 @@ const getCurrentUser = async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, req.user, 'Current user fetched successfully'));
 };
-
 
 const logoutUser = async (req, res) => {
   await User.findByIdAndUpdate(
@@ -207,54 +247,61 @@ const refreshAccessToken = async (req, res) => {
 
 const deleteUser = async (req, res, next) => {
   try {
-    console.log("Delete user request received", { params: req.params, user: req.user });
-    
+    console.log('Delete user request received', {
+      params: req.params,
+      user: req.user,
+    });
+
     const { id: userId } = req.params;
-    console.log("User ID to delete:", userId);
+    console.log('User ID to delete:', userId);
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return next(new ApiError(400, "Invalid user ID"));
+      return next(new ApiError(400, 'Invalid user ID'));
     }
 
     if (!req.user) {
-      console.error("req.user is undefined or null");
-      return next(new ApiError(401, "Authentication required"));
+      console.error('req.user is undefined or null');
+      return next(new ApiError(401, 'Authentication required'));
     }
 
-    console.log("Authenticated user:", {
+    console.log('Authenticated user:', {
       id: req.user._id,
-      role: req.user.role
+      role: req.user.role,
     });
 
     const user = await User.findById(userId);
-    console.log("User found:", user ? true : false);
+    console.log('User found:', user ? true : false);
 
     if (!user) {
-      return next(new ApiError(404, "No User Found"));
+      return next(new ApiError(404, 'No User Found'));
     }
 
     const requesterId = req.user._id.toString();
     const targetId = userId.toString();
-    
-    console.log("Comparing IDs:", {
+
+    console.log('Comparing IDs:', {
       requesterId,
       targetId,
-      isAdmin: req.user.role === "admin"
+      isAdmin: req.user.role === 'admin',
     });
 
-    if (requesterId !== targetId && req.user.role !== "admin") {
-      return next(new ApiError(403, "You are not authorized to delete this user"));
+    if (requesterId !== targetId && req.user.role !== 'admin') {
+      return next(
+        new ApiError(403, 'You are not authorized to delete this user')
+      );
     }
 
-    console.log("Permission check passed, proceeding with deletion");
-    
-    await user.deleteOne();
-    console.log("User deleted successfully");
+    console.log('Permission check passed, proceeding with deletion');
 
-    res.status(200).json(new ApiResponse(200, null, "User deleted successfully"));
+    await user.deleteOne();
+    console.log('User deleted successfully');
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, null, 'User deleted successfully'));
   } catch (error) {
-    console.error("Error in deleteUser:", error);
-    next(new ApiError(500, "Internal server error", error));
+    console.error('Error in deleteUser:', error);
+    next(new ApiError(500, 'Internal server error', error));
   }
 };
 
@@ -262,7 +309,8 @@ export {
   registerUser,
   loginUser,
   logoutUser,
+  userDetails,
   refreshAccessToken,
   getCurrentUser,
-  deleteUser
+  deleteUser,
 };

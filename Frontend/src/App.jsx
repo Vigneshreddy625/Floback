@@ -22,7 +22,6 @@ import AdminProductsList from "./admin/Products";
 import OrdersPage from "./admin/Orders";
 import AdminFabricsList from "./admin/Fabrics";
 import DashboardPage from "./admin/Dashboard";
-import GenericPage from "../../../Revispy/Frontend/src/admin/Generics";
 import AdminCollectionsList from "./admin/Collectons";
 import Login from "./components/Authentication/Login";
 import Signup from "./components/Authentication/Signup";
@@ -82,7 +81,6 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             {!isMobile && (
               <Route path="account" element={<Account />}>
-                <Route path="overview" element={<div>Overview</div>} />
                 <Route path="orders" element={<Orders />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="savedcards" element={<div>Saved Cards</div>} />
@@ -110,12 +108,6 @@ function App() {
               <Route path="products" element={<AdminProductsList />} />
               <Route path="collections" element={<AdminCollectionsList />} />
               <Route path="fabrics" element={<AdminFabricsList />} />
-              <Route path="customers" element={<GenericPage />} />
-              <Route path="reports" element={<GenericPage />} />
-              <Route path="statistic" element={<GenericPage />} />
-              <Route path="notification" element={<GenericPage />} />
-              <Route path="help" element={<GenericPage />} />
-              <Route path="settings" element={<GenericPage />} />
             </Route>
           </Route>
         </Routes>

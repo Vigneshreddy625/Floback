@@ -19,12 +19,11 @@ export default function MobileProfile() {
       minute: "2-digit",
       hour12: true,
     });
-    return `${formattedDate} · ${formattedTime}`;
+    return `${formattedDate}`;
   };
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Header */}
       <div className="bg-white/70 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10">
         <div className="flex items-center space-x-4 px-6 py-4">
           <button 
@@ -39,7 +38,6 @@ export default function MobileProfile() {
         </div>
       </div>
 
-      {/* Profile Avatar Section */}
       <div className="px-6 py-8 text-center">
         <div className="relative inline-block">
           <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
@@ -51,7 +49,6 @@ export default function MobileProfile() {
         <p className="text-blue-600 font-medium mt-1">Active Member</p>
       </div>
 
-      {/* Profile Information Cards */}
       <div className="px-6 space-y-4">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-blue-100/50 overflow-hidden">
           <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-blue-100/50">
@@ -59,8 +56,8 @@ export default function MobileProfile() {
           </div>
           <div className="p-1">
             <MobileProfileItem label="Email ID" value={user.email} />
-            <MobileProfileItem label="Mobile Number" value="93XXXXXXXX" />
-            <MobileProfileItem label="Alternate Mobile" value="- not added -" />
+            <MobileProfileItem label="Mobile Number" value={user.mobile} />
+            <MobileProfileItem label="Alternate Mobile" value={user.alternateMobile} />
           </div>
         </div>
 
@@ -70,9 +67,9 @@ export default function MobileProfile() {
           </div>
           <div className="p-1">
             <MobileProfileItem label="Full Name" value={user.fullName} />
-            <MobileProfileItem label="Gender" value="- not added -" />
-            <MobileProfileItem label="Date of Birth" value="- not added -" />
-            <MobileProfileItem label="Hint Name" value="- not added -" />
+            <MobileProfileItem label="Gender" value={user.gender} />
+            <MobileProfileItem label="Date of Birth" value={formatDateTime(user.dob)} />
+            <MobileProfileItem label="Hint Name" value={user.hintName} />
           </div>
         </div>
 
@@ -89,7 +86,6 @@ export default function MobileProfile() {
         </div>
       </div>
 
-      {/* Edit Profile Button */}
       <div className="px-6 py-8">
         <button
           onClick={() => setIsProfileOpen(true)}

@@ -31,12 +31,12 @@ export default function Profile() {
         <div className="space-y-5">
           <ProfileItem label="Full Name" value={user.fullName} />
           <ProfileItem label="Email ID" value={user.email} />
-          <ProfileItem label="Mobile Number" value="93XXXXXXXX" />
-          <ProfileItem label="Gender" value="- not added -" />
-          <ProfileItem label="Date of Birth" value="- not added -" />
+          <ProfileItem label="Mobile Number" value={user.mobile} />
+          <ProfileItem label="Gender" value={user.gender}/>
+          <ProfileItem label="Date of Birth" value={user.dob} />
           <ProfileItem label="Member Since" value={formatDateTime(user.createdAt)} />
-          <ProfileItem label="Alternate Mobile" value="- not added -" />
-          <ProfileItem label="Hint Name" value="- not added -" />
+          <ProfileItem label="Alternate Mobile" value={user.alternateMobile} />
+          <ProfileItem label="Hint Name" value={user.hintName}/>
         </div>
 
         <button onClick={() => setIsProfileOpen(true)} className="cursor-pointer mt-8 w-full bg-blue-500 hover:bg-blue-600 transition-colors text-white text-sm font-medium py-2 rounded-md shadow-sm">

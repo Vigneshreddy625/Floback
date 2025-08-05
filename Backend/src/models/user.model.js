@@ -20,10 +20,28 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    mobile: {
+      type: String,
+      trim: true
+    },
     role: {
       type: String,
       enum: ['user', 'admin'],
       default: 'user',
+    },
+    gender: {
+      type: String,
+      enum: ['Male', 'Female']
+    },
+    dob: {
+      type : Date,
+    },
+    alternateMobile : {
+      type: String,
+      trim: true
+    },
+    hintName: {
+      type: String
     },
     refreshToken: {
       type: String,

@@ -90,14 +90,13 @@ export default function MobileDeleteAccount() {
         </div>
 
         <div className="px-6 py-8">
-          {/* Warning Card */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-sm border border-white/50 mb-6">
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/50 mb-6">
             <div className="text-center">
               <div className="relative mb-6">
                 <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto">
                   <img src={img} alt="Delete account" className="w-16 h-16 rounded-2xl object-cover" />
                 </div>
-                <div className="absolute -top-2 -right-8 w-8 h-8 bg-gradient-to-r from-red-400 to-pink-400 rounded-full flex items-center justify-center">
+                <div className="absolute -top-6 -right-8 w-8 h-8 bg-gradient-to-r from-red-400 to-pink-400 rounded-full flex items-center justify-center">
                   <AlertTriangle size={16} className="text-white" />
                 </div>
               </div>
@@ -111,7 +110,6 @@ export default function MobileDeleteAccount() {
             </div>
           </div>
 
-          {/* What You'll Lose */}
           <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-sm border border-white/50 mb-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-amber-100 rounded-xl">
@@ -156,7 +154,6 @@ export default function MobileDeleteAccount() {
             </div>
           </div>
 
-          {/* Agreement Checkbox */}
           <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-sm border border-white/50 mb-6">
             <label className="flex items-start gap-4 cursor-pointer">
               <div className="relative flex-shrink-0 mt-1">
@@ -184,7 +181,6 @@ export default function MobileDeleteAccount() {
             </label>
           </div>
 
-          {/* Error Message */}
           {authError && (
             <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6">
               <div className="flex items-center gap-3">
@@ -194,7 +190,6 @@ export default function MobileDeleteAccount() {
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="space-y-4">
             <button
               onClick={handleOpenDeleteModal}
@@ -223,7 +218,6 @@ export default function MobileDeleteAccount() {
             </button>
           </div>
 
-          {/* Additional Safety Note */}
           <div className="mt-8 text-center">
             <p className="text-xs text-gray-500 leading-relaxed max-w-sm mx-auto">
               This action cannot be undone. Please consider all options before proceeding with account deletion.

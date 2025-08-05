@@ -1,3 +1,4 @@
+// Enhanced AuthContext with debugging and better error handling
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { addUser, clearUser } from "../redux/Auth/authSlice";
 import axios from "axios";
@@ -6,10 +7,8 @@ import LoadingScreen from "../components/Items/LoadingScreen";
 
 const AuthContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_BACKEND_URL
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 axios.defaults.baseURL = API_URL;
-
-
 axios.defaults.withCredentials = true;
 
 export const useAuth = () => {
@@ -30,9 +29,9 @@ export const AuthProvider = ({ children }) => {
     const checkAuthStatus = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `/users/current-user`, {withCredentials: true}
-        );
+        const response = await axios.get(`/users/current-user`, {
+          withCredentials: true,
+        });
         if (response.data.data) {
           setUser(response.data.data);
           dispatch(addUser(response.data.data));
@@ -61,13 +60,9 @@ export const AuthProvider = ({ children }) => {
         throw new Error("All fields are required");
       }
 
-      const response = await axios.post(
-        `/users/register`,
-        userData,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(`/users/register`, userData, {
+        withCredentials: true,
+      });
 
       return response.data;
     } catch (err) {
@@ -91,13 +86,9 @@ export const AuthProvider = ({ children }) => {
         throw new Error("Email and password are required");
       }
 
-      const response = await axios.post(
-        `/users/login`,
-        credentials,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(`/users/login`, credentials, {
+        withCredentials: true,
+      });
 
       const { user: userData } = response.data.data;
       setUser(userData);
@@ -105,6 +96,54 @@ export const AuthProvider = ({ children }) => {
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Login failed");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateUserDetails = async (details) => {
+    try {
+      console.log("🔄 Starting updateUserDetails with:", details);
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.patch(`/users/update-details`, details, {
+        withCredentials: true,
+      });
+
+      console.log("✅ Full update response:", response);
+      console.log("✅ Response data:", response.data);
+      
+      // Your backend returns user data in response.data.user
+      const updatedUser = response.data.user;
+      console.log("📦 Found user in response.data.user:", updatedUser);
+      
+      // Update both states with the user data from your backend
+      if (updatedUser && updatedUser.email) {
+        setUser(updatedUser);
+        dispatch(addUser(updatedUser));
+        console.log("✅ Updated user state:", updatedUser);
+      } else {
+        console.error("❌ Invalid user data received:", updatedUser);
+        throw new Error("Invalid user data received from server");
+      }
+      
+      return updatedUser;
+    } catch (err) {
+      console.error("❌ Update user details error:", err);
+      console.error("❌ Error response:", err.response?.data);
+      
+      // Don't clear user on update failure unless it's an auth error
+      if (err.response?.status === 401) {
+        console.log("🚫 Auth error during update, clearing user");
+        setUser(null);
+        dispatch(clearUser());
+      }
+      
+      setError(
+        err.response?.data?.message || err.message || "Failed to update details"
+      );
       throw err;
     } finally {
       setLoading(false);
@@ -134,6 +173,7 @@ export const AuthProvider = ({ children }) => {
 
   const refreshToken = async () => {
     try {
+      console.log("🔄 Refreshing token...");
       const response = await axios.post(
         `/users/refresh-token`,
         {},
@@ -141,52 +181,62 @@ export const AuthProvider = ({ children }) => {
       );
 
       const accessToken = response.data.accessToken;
+      console.log("✅ Token refreshed successfully");
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
       return accessToken;
     } catch (err) {
+      console.error("❌ Token refresh failed:", err);
       setUser(null);
       dispatch(clearUser());
       throw err;
     }
   };
 
-const deleteUser = async (userId) => {
-  try {
-    setLoading(true);
-    setError(null);
+  const deleteUser = async (userId) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    await axios.post(
-      `/users/delete-user/${userId}`, 
-      {}, 
-      {
-        withCredentials: true,
-      }
-    );
-    setUser(null);
-    dispatch(clearUser());
-    return true;
-  } catch (error) {
-    console.error("Delete request failed:", error);
-    setError(error.response?.data?.message || error.message || "Delete failed");
-    throw error;
-  } finally {
-    setLoading(false);
-  }
-};
+      await axios.post(
+        `/users/delete-user/${userId}`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      setUser(null);
+      dispatch(clearUser());
+      return true;
+    } catch (error) {
+      console.error("Delete request failed:", error);
+      setError(
+        error.response?.data?.message || error.message || "Delete failed"
+      );
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use(
       (config) => {
+        console.log("📤 Request:", config.method?.toUpperCase(), config.url);
         return config;
       },
       (error) => Promise.reject(error)
     );
 
     const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        console.log("📥 Response:", response.status, response.config.url);
+        return response;
+      },
       async (error) => {
+        console.log("❌ Response error:", error.response?.status, error.config?.url);
+        
         const originalRequest = error.config;
 
         if (
@@ -195,11 +245,14 @@ const deleteUser = async (userId) => {
           !originalRequest.url?.includes("refresh-token")
         ) {
           originalRequest._retry = true;
+          console.log("🔄 Attempting token refresh for failed request");
 
           try {
             await refreshToken();
+            console.log("✅ Retrying original request after token refresh");
             return axios(originalRequest);
           } catch (err) {
+            console.error("❌ Token refresh failed, clearing user");
             setUser(null);
             dispatch(clearUser());
             return Promise.reject(err);
@@ -223,6 +276,7 @@ const deleteUser = async (userId) => {
     register,
     login,
     logout,
+    updateUserDetails,
     refreshToken,
     deleteUser,
     isAuthenticated: !!user,
@@ -236,7 +290,7 @@ export const withAuth = (Component) => {
     const { user, loading, isAuthenticated } = useAuth();
 
     if (loading) {
-      return <LoadingScreen/>;
+      return <LoadingScreen />;
     }
 
     if (!isAuthenticated) {
