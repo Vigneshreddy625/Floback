@@ -92,13 +92,13 @@ function Header() {
           </nav>
 
           <div className="flex items-center space-x-1 sm:space-x-2">
-            {showSearch && (
+            {/* {showSearch && (
               <input
                 type="text"
                 placeholder="Search..."
                 className="hidden sm:block px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 w-40 sm:w-64 text-sm"
               />
-            )}
+            )} */}
 
             <button
               onClick={() => navigate("/wishlist")}

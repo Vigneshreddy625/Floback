@@ -188,6 +188,8 @@ const Cart = () => {
               loading={loading}
               updateQuantity={handleUpdateQuantity}
               removeItem={handleRemoveItem}
+              dispatch={dispatch}
+              fetchUserCart={fetchUserCart}
             />
           </div>
 

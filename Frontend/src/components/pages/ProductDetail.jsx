@@ -41,10 +41,13 @@ const ProductDetailPage = () => {
     }
   }, [dispatch, productId]);
 
+  console.log(productData);
+  console.log(wishlistItems);
+
   useEffect(() => {
     if (productData && wishlistItems) {
       const alreadyInWishlist = wishlistItems.some(
-        (item) => (item.itemId._id || item.itemId) === productData._id
+        (item) => (item?.itemId?._id || item.itemId) === productData._id
       );
       setIsWishlisted(alreadyInWishlist);
     }

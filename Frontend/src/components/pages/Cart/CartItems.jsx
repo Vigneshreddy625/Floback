@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 
-const CartItems = ({ cartItems, removeItem }) => {
+const CartItems = ({ cartItems, removeItem, dispatch, fetchUserCart }) => {
 
-  console.log(cartItems);
+  useEffect(() => {
+    dispatch(fetchUserCart());
+  },[dispatch, fetchUserCart, cartItems]);
 
   return (
     <>

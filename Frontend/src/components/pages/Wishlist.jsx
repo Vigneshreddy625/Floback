@@ -31,14 +31,16 @@ const Wishlist = () => {
     wishlistItems,
     loading: wishlistLoading,
     removeWishlistItem,
+    refetchWishlist
   } = useWishlist();
   // const {
   //   handleAddToCart,
   //   loading: addToCartLoading,
   // } = useAddToCart();
 
-  useEffect
-
+  useEffect(() => {
+  refetchWishlist();
+}, [refetchWishlist]);
 
   const navigate = useNavigate();
   console.log(wishlistItems)
