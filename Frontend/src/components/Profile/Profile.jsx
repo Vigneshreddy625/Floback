@@ -20,7 +20,7 @@ export default function Profile() {
     hour12: true,
   });
 
-  return `${formattedDate} · ${formattedTime}`;
+  return `${formattedDate}`;
 };
 
   return (
@@ -33,7 +33,7 @@ export default function Profile() {
           <ProfileItem label="Email ID" value={user.email} />
           <ProfileItem label="Mobile Number" value={user.mobile} />
           <ProfileItem label="Gender" value={user.gender}/>
-          <ProfileItem label="Date of Birth" value={user.dob} />
+          <ProfileItem label="Date of Birth" value={formatDateTime(user.dob)} />
           <ProfileItem label="Member Since" value={formatDateTime(user.createdAt)} />
           <ProfileItem label="Alternate Mobile" value={user.alternateMobile} />
           <ProfileItem label="Hint Name" value={user.hintName}/>

@@ -76,7 +76,7 @@ function App() {
               path="/fabric-collection/:collectionId"
               element={<FabricCollectionDetail />}
             />
-            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/product/:productId" element={<ProductDetail />} />
             <Route path="/fabric/:fabricId" element={<FabricDetail />} />
             <Route path="/wishlist" element={<Wishlist />} />
             {!isMobile && (

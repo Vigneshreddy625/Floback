@@ -1,39 +1,103 @@
-import React, { useState } from 'react';
-import { Heart, ZoomIn, Star, Shield, Truck, RotateCcw, MessageCircle, Share2, Minus, Plus } from 'lucide-react';
-import Header from '../Layout/Header';
-import { Lens } from '../ui/lens';
+import React, { useState, useEffect } from "react";
+import {
+  Heart,
+  ZoomIn,
+  Star,
+  Shield,
+  Truck,
+  RotateCcw,
+  MessageCircle,
+  Share2,
+  Minus,
+  Plus,
+} from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import Header from "../Layout/Header";
+import { Lens } from "../ui/lens";
+import { useWishlistActions } from "../../hooks/wishlistHooks";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getProductById,
+  selectSelectedProduct,
+} from "../../redux/Products/productSlice";
+import { useWishlist } from "../../wishlistContext/useWishlist";
+import { cartHooks } from "../../hooks/userCartActions";
 
 const ProductDetailPage = () => {
+  const { wishlistItems } = useWishlist();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState('slate');
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const { handleAddToWishlist } = useWishlistActions();
+  const { handleAddToCart } = cartHooks();
   const [hovering, setHovering] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { productId } = useParams();
+  const productData = useSelector(selectSelectedProduct);
+  console.log(wishlistItems);
+  useEffect(() => {
+    if (productId) {
+      dispatch(getProductById(productId));
+    }
+  }, [dispatch, productId]);
+
+  useEffect(() => {
+    if (productData && wishlistItems) {
+      const alreadyInWishlist = wishlistItems.some(
+        (item) => (item.itemId._id || item.itemId) === productData._id
+      );
+      setIsWishlisted(alreadyInWishlist);
+    }
+  }, [productData, wishlistItems]);
+
+  const handleWhatsAppQuote = (productData) => {
+    if (!productData) return;
+
+    const message = encodeURIComponent(
+      `👋 Hello! I'm interested in this product.\n\nName: ${productData.name}\nID: ${productData.productId}\nCould you please assist me with more details?`
+    );
+
+    window.open(`https://wa.me/917382178982?text=${message}`, "_blank");
+  };
+
+  const handleNativeShare = () => {
+      if (navigator.share) {
+        navigator
+          .share({
+            title: "Check out this product!",
+            text: "👋 Hey! I found this product you might like:",
+            url: window.location.href,
+          })
+          .then(() => console.log("Shared successfully"))
+          .catch((error) => console.error("Error sharing:", error));
+      } else {
+        alert("Sharing is not supported in your browser.");
+      }
+    };
+
+  if (!productData) return <div>Loading or no product data...</div>;
+
+  const defaultFeatures = [
+    "High-quality stitching",
+    "Fade-resistant material",
+    "Lightweight & breathable",
+    "Easy to wash and maintain",
+  ];
+
+  const featuresToShow =
+    productData?.features?.length > 0 ? productData.features : defaultFeatures;
 
   const productImages = [
-    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=600&fit=crop&sat=-100',
-    'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=600&fit=crop&hue=30'
+    productData.mainImageUrl,
+    ...productData.additionalImageUrls,
   ];
 
-  const colorOptions = [
-    { name: 'Slate Blue', value: 'slate', color: 'bg-slate-500' },
-    { name: 'Charcoal', value: 'charcoal', color: 'bg-gray-800' },
-    { name: 'Cream', value: 'cream', color: 'bg-amber-100' },
-    { name: 'Mustard', value: 'mustard', color: 'bg-yellow-600' },
-    { name: 'Navy', value: 'navy', color: 'bg-blue-900' }
-  ];
-
-  const features = [
-    { icon: Shield, text: 'Premium quality materials' },
-    { icon: Truck, text: 'Professional installation included' },
-    { icon: RotateCcw, text: '2-year warranty' },
-    { text: 'Custom sizing available' },
-    { text: 'Easy maintenance' },
-    { text: 'Stain resistant fabric' }
-  ];
+  const formatPrice = (price) => {
+    return `₹${price.toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white text-sm md:text-base">
@@ -58,11 +122,15 @@ const ProductDetailPage = () => {
                   onClick={() => setSelectedImage(index)}
                   className={`rounded-xl overflow-hidden transition-all duration-300 w-16 h-16 flex-shrink-0 ${
                     selectedImage === index
-                      ? 'ring-2 ring-amber-500 ring-offset-1 scale-105'
-                      : 'hover:scale-105 hover:shadow'
+                      ? "ring-2 ring-amber-500 ring-offset-1 scale-105"
+                      : "hover:scale-105 hover:shadow"
                   }`}
                 >
-                  <img src={image} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
+                  <img
+                    src={image}
+                    alt={`View ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -72,109 +140,126 @@ const ProductDetailPage = () => {
             <div>
               <div className="flex items-center space-x-2 mb-2">
                 <span className="bg-amber-400 text-white px-2 py-1 rounded text-xs font-semibold">
-                  SOFA UPHOLSTERY
+                  {productData.category}
                 </span>
               </div>
 
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">18 Collection</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+                {productData.name}
+              </h1>
 
               <div className="flex items-baseline space-x-2 mb-3">
-                <span className="text-xl font-bold text-amber-600">₹2,999</span>
+                <span className="text-xl font-bold text-amber-600">
+                  {formatPrice(productData.price)}
+                </span>
               </div>
 
               <p className="text-gray-600 leading-relaxed text-sm">
-                Premium quality home furnishing with customizable fabric options. Transform your living space with our luxurious upholstery collection.
+                {productData.description}
               </p>
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium mb-2">Choose Color</h3>
-              <div className="flex space-x-2">
-                {colorOptions.map((color) => (
-                  <button
-                    key={color.value}
-                    onClick={() => setSelectedColor(color.value)}
-                    className={`w-9 h-9 rounded-full ${color.color} transition-all duration-300 ${
-                      selectedColor === color.value ? 'ring-2 ring-amber-500 scale-105' : 'hover:scale-105 shadow'
-                    }`}
-                    title={color.name}
-                  />
-                ))}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-6">
+                {productData?.color && (
+                  <div>
+                    <h3 className="font-semibold text-gray-800">Color</h3>
+                    <div
+                      className="w-8 h-8 rounded-full border-2 border-white ring-2 ring-gray-300 shadow-sm mt-1"
+                      style={{ backgroundColor: productData.color }}
+                    ></div>
+                  </div>
+                )}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-gray-800">Material</h3>
+                  <span className="text-gray-600 capitalize">
+                    {productData.material}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-gray-800">Pattern</h3>
+                  <span className="text-gray-600 capitalize">
+                    {productData.pattern}
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="space-y-4">
-              {/* <div className="flex items-center space-x-3">
-                <span className="text-sm font-medium">Qty:</span>
-                <div className="flex items-center border rounded overflow-hidden text-sm">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2 hover:bg-gray-100"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="px-4 py-1 font-medium min-w-[40px] text-center">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-2 hover:bg-gray-100"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div> */}
-
               <div className="grid grid-cols-12 gap-2">
-                <button className="col-span-8 bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 px-4 rounded-xl">
+                <button
+                  className="col-span-8 bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 px-4 rounded-xl"
+                  onClick={() => handleAddToCart(productData)}
+                >
                   Add to Cart
                 </button>
                 <button
-                  onClick={() => setIsWishlisted(!isWishlisted)}
+                  onClick={() => {
+                    handleAddToWishlist(productData);
+                  }}
+                  disabled={isWishlisted}
                   className={`col-span-2 border rounded-xl p-3 ${
-                    isWishlisted ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-300 hover:bg-red-50'
+                    isWishlisted
+                      ? "border-red-500 bg-red-50 text-red-600"
+                      : "border-gray-300 hover:bg-red-50"
                   }`}
                 >
-                  <Heart className={`w-5 h-5 mx-auto ${isWishlisted ? 'fill-current' : ''}`} />
+                  <Heart
+                    className={`w-5 h-5 mx-auto ${
+                      isWishlisted ? "fill-current" : ""
+                    }`}
+                  />
                 </button>
-                <button className="col-span-2 border border-gray-300 rounded-xl p-3 hover:bg-gray-100">
+                <button className="col-span-2 border border-gray-300 rounded-xl p-3 hover:bg-gray-100" onClick={handleNativeShare}>
                   <Share2 className="w-5 h-5 mx-auto text-gray-600" />
                 </button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button className="bg-green-500 hover:bg-green-600 text-white py-2.5 px-4 rounded-xl flex items-center justify-center space-x-2 text-sm">
+                <button
+                  className="bg-green-500 hover:bg-green-600 text-white py-2.5 px-4 rounded-xl flex items-center justify-center space-x-2 text-sm"
+                  onClick={() => handleWhatsAppQuote(productData)}
+                >
                   <MessageCircle className="w-4 h-4" />
                   <span>Quote on WhatsApp</span>
                 </button>
-                <button className="bg-gray-900 hover:bg-gray-800 text-white py-2.5 px-4 rounded-xl text-sm">
+                <button
+                  className="bg-gray-900 hover:bg-gray-800 text-white py-2.5 px-4 rounded-xl text-sm"
+                  onClick={() => navigate("/book-demo")}
+                >
                   Book Home Demo
                 </button>
               </div>
             </div>
 
-            <div className="bg-white/60 backdrop-blur border border-gray-100 shadow-md rounded-xl p-4">
-              <h3 className="text-base font-semibold mb-3 text-gray-800">Product Features</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {features.map((feature, index) => (
+            <div className="bg-white rounded-3xl shadow-lg p-4">
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                Key Features
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {featuresToShow.map((feature, index) => (
                   <div
                     key={index}
-                    className="flex items-center space-x-2 text-sm text-gray-700 hover:bg-white/50 p-2 rounded"
+                    className="flex items-start space-x-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                   >
-                    {feature.icon && <feature.icon className="w-4 h-4 text-amber-600" />}
-                    <span>{feature.text}</span>
+                    <Star className="w-5 h-5 text-amber-500 flex-shrink-0 mt-1" />
+                    <span>{feature}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3 pt-4 text-xs">
+            <div className="flex flex-wrap gap-3 pt-2 text-xs">
               <div className="flex items-center space-x-1 bg-green-50 px-3 py-1.5 rounded-full">
                 <Shield className="w-4 h-4 text-green-600" />
                 <span className="text-green-800">Secure Payment</span>
               </div>
-              <div className="flex items-center space-x-1 bg-blue-50 px-3 py-1.5 rounded-full">
-                <Truck className="w-4 h-4 text-blue-600" />
-                <span className="text-blue-800">Free Delivery</span>
-              </div>
+              {productData.price > 1000 && (
+                <div className="flex items-center space-x-1 bg-blue-50 px-3 py-1.5 rounded-full">
+                  <Truck className="w-4 h-4 text-blue-600" />
+                  <span className="text-blue-800">Free Delivery</span>
+                </div>
+              )}
               <div className="flex items-center space-x-1 bg-purple-50 px-3 py-1.5 rounded-full">
                 <RotateCcw className="w-4 h-4 text-purple-600" />
                 <span className="text-purple-800">Easy Returns</span>

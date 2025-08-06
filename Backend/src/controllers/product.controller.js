@@ -142,6 +142,7 @@ const addProduct = async (req, res, next) => {
             price: parseFloat(productData.price), 
             mainImageUrl: mainImageUrl,
             additionalImageUrls: additionalImageUrls, 
+            color: productData.color,
             category: productData.category,
             material: productData.material,
             style: productData.style,

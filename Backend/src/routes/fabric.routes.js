@@ -19,6 +19,6 @@ router.route('/add').post(
 );
 router.route('/update/:fabricId').patch(updateFabric);
 router.route('/all').get(getAllFabrics);
-router.route('/:productId').get(getFabricById); 
+router.route('/:fabricId').get(getFabricById); 
 
 export default router;

@@ -44,7 +44,7 @@ export const addFabric = createAsyncThunk(
       formData.append("description", fabricData.description);
       formData.append("price", fabricData.price);
       formData.append("collectionName", fabricData.collectionName);
-      formData.append("collectionId", fabricData.collectionId); // Assuming category maps to collectionId
+      formData.append("collectionId", fabricData.collectionId); 
       formData.append("material", fabricData.material || "");
       formData.append("style", fabricData.style || "");
       formData.append("pattern", fabricData.pattern || "");

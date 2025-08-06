@@ -119,7 +119,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
         className="w-full md:max-w-xl h-full md:h-auto max-h-full md:max-h-[90vh] bg-white md:rounded-2xl shadow-lg overflow-hidden border flex flex-col"
       >
-        <div className="relative h-14 bg-gradient-to-r from-blue-500 to-indigo-500">
+        <div className="relative h-20 bg-gradient-to-r from-blue-500 to-indigo-500">
           <button
             onClick={onClose}
             className="absolute top-3 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
