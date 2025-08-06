@@ -1,8 +1,10 @@
 import React from 'react';
-import { Mail, Search, Filter } from "lucide-react";
+import { Mail, Search, Filter, User } from "lucide-react";
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../authContext/useAuth';
 
 const Header = () => {
+  const { user } = useAuth();
   const location = useLocation();
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const lastSegment = pathSegments[pathSegments.length - 1] || 'Dashboard';
@@ -16,22 +18,19 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
-          <div className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-            <Mail size={20} className="text-gray-600" />
-          </div>
           <div className="flex items-center gap-2">
-            <img
-              src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face"
-              alt="Kristina Evans"
-              className="w-8 h-8 rounded-full"
+            <div className="w-10 h-10 rounded-full bg-gray-100 flex justify-center items-center">
+            <User
+              className="w-6 h-6"
               onError={(e) => { e.target.onerror = null; e.target.src="https://placehold.co/32x32/cccccc/333333?text=KE" }}
             />
+            </div>
             <div className="text-sm hidden sm:block">
               <div className="font-medium text-gray-900">
-                Kristina Evans
+                {user.fullName}
               </div>
               <div className="text-gray-500 text-xs">
-                kris.evans@gmail.com
+                {user.email}
               </div>
             </div>
           </div>

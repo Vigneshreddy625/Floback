@@ -11,7 +11,7 @@ const ProductFilter = ({
   const searchTimeoutRef = useRef(null);
 
   const selectStyle =
-    "w-full bg-white text-black border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 z-50";
+    "w-full bg-white text-black border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500";
   useEffect(() => {
     if (searchInputRef.current) {
       searchInputRef.current.value = activeFilters.search || "";

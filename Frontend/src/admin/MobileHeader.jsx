@@ -1,8 +1,10 @@
 // src/components/MobileHeader.jsx
 import React from "react";
-import { Mail, Search } from "lucide-react";
+import { Mail, Search, User } from "lucide-react";
+import { useAuth } from "../authContext/useAuth";
 
 const MobileHeader = ({ onMenuClick }) => {
+  const { user } = useAuth();
   return (
     <div className="lg:hidden p-4 bg-white shadow-md flex justify-between items-center">
       <button onClick={onMenuClick}>
@@ -17,29 +19,22 @@ const MobileHeader = ({ onMenuClick }) => {
         </svg>
       </button>
 
-      <div className="flex items-center gap-4">
-        <div className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-          <Mail size={20} className="text-gray-600" />
-        </div>
-        <div className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-          <Search size={20} className="text-gray-600" />
-        </div>
-        <div className="flex items-center gap-2">
-          <img
-            src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face"
-            alt="Kristina Evans"
-            className="w-8 h-8 rounded-full"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "https://placehold.co/32x32/cccccc/333333?text=KE";
-            }}
-          />
-          <div className="text-sm hidden sm:block">
-            <div className="font-medium text-gray-900">Kristina Evans</div>
-            <div className="text-gray-500 text-xs">kris.evans@gmail.com</div>
+      <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-gray-100 flex justify-center items-center">
+            <User
+              className="w-6 h-6"
+              onError={(e) => { e.target.onerror = null; e.target.src="https://placehold.co/32x32/cccccc/333333?text=KE" }}
+            />
+            </div>
+            <div className="text-sm">
+              <div className="font-medium text-gray-900">
+                {user.fullName}
+              </div>
+              <div className="text-gray-500 text-xs">
+                {user.email}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
     </div>
   );
 };

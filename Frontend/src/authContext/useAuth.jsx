@@ -1,4 +1,3 @@
-// Enhanced AuthContext with debugging and better error handling
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { addUser, clearUser } from "../redux/Auth/authSlice";
 import axios from "axios";
@@ -75,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (credentials) => {
+  const login = async (credentials, navigate) => {
     try {
       setLoading(true);
       setError(null);
@@ -93,6 +92,11 @@ export const AuthProvider = ({ children }) => {
       const { user: userData } = response.data.data;
       setUser(userData);
       dispatch(addUser(userData));
+      if (userData.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/home");
+      }
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Login failed");
@@ -114,10 +118,10 @@ export const AuthProvider = ({ children }) => {
 
       console.log("✅ Full update response:", response);
       console.log("✅ Response data:", response.data);
-      
+
       const updatedUser = response.data.user;
       console.log("📦 Found user in response.data.user:", updatedUser);
-      
+
       if (updatedUser && updatedUser.email) {
         setUser(updatedUser);
         dispatch(addUser(updatedUser));
@@ -126,18 +130,18 @@ export const AuthProvider = ({ children }) => {
         console.error("❌ Invalid user data received:", updatedUser);
         throw new Error("Invalid user data received from server");
       }
-      
+
       return updatedUser;
     } catch (err) {
       console.error("❌ Update user details error:", err);
       console.error("❌ Error response:", err.response?.data);
-      
+
       if (err.response?.status === 401) {
         console.log("🚫 Auth error during update, clearing user");
         setUser(null);
         dispatch(clearUser());
       }
-      
+
       setError(
         err.response?.data?.message || err.message || "Failed to update details"
       );
@@ -232,8 +236,12 @@ export const AuthProvider = ({ children }) => {
         return response;
       },
       async (error) => {
-        console.log("❌ Response error:", error.response?.status, error.config?.url);
-        
+        console.log(
+          "❌ Response error:",
+          error.response?.status,
+          error.config?.url
+        );
+
         const originalRequest = error.config;
 
         if (

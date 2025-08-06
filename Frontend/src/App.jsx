@@ -41,6 +41,9 @@ import Details from "./components/MobileAccount/Details";
 import MobileOrders from "./components/MobileAccount/Orders";
 import MobileSignup from "./components/Authentication/MobileSignup";
 import MobileLogin from "./components/Authentication/MobileLogin";
+import AdminLogin from "./admin/Authentication/AdminLogin";
+import AdminProtectedRoute from "./admin/Authentication/ProtectedRoute";
+import MobileAdminLogin from "./admin/Authentication/MobileAdminLogin";
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -65,19 +68,18 @@ function App() {
             <>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/adminlogin123" element={<AdminLogin />} />
             </>
           ) : (
             <>
               <Route path="/login" element={<MobileLogin />} />
               <Route path="/signup" element={<MobileSignup />} />
+              <Route path="/adminlogin123" element={<MobileAdminLogin />} />
             </>
           )}
           <Route element={<ProtectedRoute />}>
             <Route path="/home" element={<Index />} />
             <Route path="/shop" element={<Shop />} />
-            <Route path="/admin/add-item" element={<AddItem />} />
-            <Route path="/admin/add-fabric" element={<AddFabric />} />
-            <Route path="/admin/add-collection" element={<AddCollection />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/collections" element={<Collections />} />
             <Route path="/book-demo" element={<BookDemo />} />
@@ -114,7 +116,7 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="*" element={<NotFound />} />
           </Route>
-          <Route element={<ProtectedRoute />}>
+          <Route element={<AdminProtectedRoute requiredRole="admin"  />}>
             <Route path="/admin" element={<Admin />}>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<DashboardPage />} />

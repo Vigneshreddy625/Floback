@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../authContext/useAuth";
 import img from "../../assets/Login/loginm-1.jpeg";
 
-export default function MobileLogin() {
+export default function MobileAdminLogin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -13,32 +13,6 @@ export default function MobileLogin() {
   const passwordRef = useRef(null);
   const navigate = useNavigate();
   const { login, error: authError, loading: authLoading } = useAuth();
-
-  const [tapCount, setTapCount] = useState(0);
-  const [showAdminInput, setShowAdminInput] = useState(false);
-  const [adminCode, setAdminCode] = useState("");
-  const adminTimer = useRef(null);
-
-  const handleSecretClick = () => {
-    setTapCount((prev) => prev + 1);
-    clearTimeout(adminTimer.current);
-    adminTimer.current = setTimeout(() => setTapCount(0), 2000);
-
-    if (tapCount + 1 >= 3) {
-      setShowAdminInput(true);
-      setTapCount(0);
-    }
-  };
-
-  const handleAdminSubmit = (e) => {
-    e.preventDefault();
-    if (adminCode === "pramod") {
-      navigate("/adminlogin123");
-    } else {
-      setAdminCode("");
-      setShowAdminInput(false);
-    }
-  };
 
   useEffect(() => {
     if (authError) {
@@ -71,16 +45,10 @@ export default function MobileLogin() {
     setIsLoading(true);
     setErrorMessage("");
     try {
-      await login(
-        { email: formData.email, password: formData.password },
-        navigate
-      );
+      await login({ email: formData.email, password: formData.password }, navigate);
     } catch (error) {
       setErrorMessage(error.message || "An error occurred during login");
-      setErrors((prev) => ({
-        ...prev,
-        general: error.message || "An error occurred during login",
-      }));
+      setErrors((prev) => ({ ...prev, general: error.message || "An error occurred during login" }));
     } finally {
       setIsLoading(false);
     }
@@ -101,30 +69,14 @@ export default function MobileLogin() {
             <div className="text-center mb-6">
               <h1
                 className="text-white text-2xl font-bold tracking-wide cursor-pointer"
-                onClick={handleSecretClick}
               >
                 Floriva
               </h1>
             </div>
 
-            {showAdminInput && (
-              <div className="mb-4">
-                <input
-                  type="password"
-                  value={adminCode}
-                  onChange={(e) => setAdminCode(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleAdminSubmit(e);
-                  }}
-                  className="w-full px-6 py-4 bg-white/20 bg-opacity-80 backdrop-blur-sm rounded-full text-white placeholder-white placeholder-opacity-80 border-none focus:outline-none focus:ring-2 focus:ring-gray-50 focus:ring-opacity-50 text-center"
-                  placeholder="Enter Admin Code"
-                />
-              </div>
-            )}
-
             <div className="text-center mb-8">
               <p className="text-white text-opacity-80 text-sm">
-                Enter Login Details
+                Enter Admin Details
               </p>
             </div>
 
