@@ -34,11 +34,13 @@ import Delete from "./components/Profile/Delete";
 import { Suspense } from "react";
 import LoadingScreen from "./components/Items/LoadingScreen";
 import Cart from "./components/pages/Cart/Cart";
-import MobileAccount from "./components/MobileAccount/Account"
+import MobileAccount from "./components/MobileAccount/Account";
 import MobileDeleteAccount from "./components/MobileAccount/Delete";
-import MobileAddresses from "./components/MobileAccount/Addresses"
-import Details from "./components/MobileAccount/Details"
-import MobileOrders from "./components/MobileAccount/Orders"
+import MobileAddresses from "./components/MobileAccount/Addresses";
+import Details from "./components/MobileAccount/Details";
+import MobileOrders from "./components/MobileAccount/Orders";
+import MobileSignup from "./components/Authentication/MobileSignup";
+import MobileLogin from "./components/Authentication/MobileLogin";
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -59,8 +61,17 @@ function App() {
       <Toaster position="top-right" richColors offset={75} />
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          {!isMobile ? (
+            <>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </>
+          ) : (
+            <>
+              <Route path="/login" element={<MobileLogin />} />
+              <Route path="/signup" element={<MobileSignup />} />
+            </>
+          )}
           <Route element={<ProtectedRoute />}>
             <Route path="/home" element={<Index />} />
             <Route path="/shop" element={<Shop />} />
@@ -94,7 +105,10 @@ function App() {
                 <Route path="orders" element={<MobileOrders />} />
                 <Route path="account/details" element={<Details />} />
                 <Route path="account/addresses" element={<MobileAddresses />} />
-                <Route path="account/delete" element={<MobileDeleteAccount />} />
+                <Route
+                  path="account/delete"
+                  element={<MobileDeleteAccount />}
+                />
               </>
             )}
             <Route path="/cart" element={<Cart />} />
