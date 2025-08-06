@@ -38,46 +38,28 @@ export default function MobileProfile() {
         </div>
       </div>
 
-      <div className="px-6 py-8 text-center">
+      <div className="px-6 py-4 text-center">
         <div className="relative inline-block">
-          <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
-            <User className="w-12 h-12 text-white" />
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+            <User className="w-8 h-8 text-white" />
           </div>
-          <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-400 rounded-full border-4 border-white shadow-md"></div>
         </div>
         <h3 className="text-2xl font-bold text-gray-800 mt-4">{user.fullName}</h3>
-        <p className="text-blue-600 font-medium mt-1">Active Member</p>
       </div>
 
       <div className="px-6 space-y-4">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-blue-100/50 overflow-hidden">
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-blue-100/50">
-            <h4 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">Contact Information</h4>
-          </div>
-          <div className="p-1">
-            <MobileProfileItem label="Email ID" value={user.email} />
-            <MobileProfileItem label="Mobile Number" value={user.mobile} />
-            <MobileProfileItem label="Alternate Mobile" value={user.alternateMobile} />
-          </div>
-        </div>
-
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-blue-100/50 overflow-hidden">
           <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-blue-100/50">
             <h4 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">Personal Details</h4>
           </div>
           <div className="p-1">
             <MobileProfileItem label="Full Name" value={user.fullName} />
+            <MobileProfileItem label="Email ID" value={user.email} />
+            <MobileProfileItem label="Mobile Number" value={user.mobile} />
             <MobileProfileItem label="Gender" value={user.gender} />
             <MobileProfileItem label="Date of Birth" value={formatDateTime(user.dob)} />
+            <MobileProfileItem label="Alternate Mobile" value={user.alternateMobile} />
             <MobileProfileItem label="Hint Name" value={user.hintName} />
-          </div>
-        </div>
-
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-blue-100/50 overflow-hidden">
-          <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-blue-100/50">
-            <h4 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">Account Information</h4>
-          </div>
-          <div className="p-1">
             <MobileProfileItem
               label="Member Since"
               value={formatDateTime(user.createdAt)}
@@ -86,7 +68,7 @@ export default function MobileProfile() {
         </div>
       </div>
 
-      <div className="px-6 py-8">
+      <div className="px-6 py-6">
         <button
           onClick={() => setIsProfileOpen(true)}
           className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2"

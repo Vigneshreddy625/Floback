@@ -58,28 +58,26 @@ function Header() {
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-gray-200 transition-all duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          <div className="flex items-center space-x-3 group cursor-pointer">
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          <div className="flex items-center space-x-2 sm:space-x-3 group cursor-pointer">
             <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25 group-hover:shadow-yellow-500/50 transition-all duration-300 group-hover:scale-110">
-                <Sofa className="w-7 h-7 text-black" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25 group-hover:shadow-yellow-500/50 transition-all duration-300 group-hover:scale-110">
+                <Sofa className="w-6 h-6 sm:w-7 sm:h-7 text-black" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-pulse"></div>
             </div>
             <div onClick={() => navigate("/home")}>
-              <h1 className="text-3xl lg:text-4xl font-black tracking-tight">
+              <h1 className="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
                 <span className="text-black">Flo</span>
                 <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                   riva
                 </span>
               </h1>
-              <div className="text-xs text-gray-500 font-medium tracking-wider">
+              <div className="text-[10px] sm:text-xs text-gray-500 font-medium tracking-wider">
                 LUXURY INTERIORS
               </div>
             </div>
           </div>
-
-          {/* Navigation for Desktop */}
           <nav className="hidden lg:flex items-center space-x-1">
             {navItems.map((item) => (
               <a
@@ -93,47 +91,38 @@ function Header() {
             ))}
           </nav>
 
-          {/* Right Icons */}
-          <div className="flex items-center space-x-2">
-            {/* Search Input (only in /search) */}
+          <div className="flex items-center space-x-1 sm:space-x-2">
             {showSearch && (
               <input
                 type="text"
-                placeholder="Search products..."
-                className="hidden sm:block px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 w-64 transition-all duration-300"
+                placeholder="Search..."
+                className="hidden sm:block px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 w-40 sm:w-64 text-sm"
               />
             )}
+
             <button
               onClick={() => navigate("/wishlist")}
-              className="relative p-2 rounded-lg hover:bg-yellow-500/10 transition"
+              className="p-2 rounded-lg hover:bg-yellow-500/10 transition"
             >
-              <Heart className="w-6 h-6 text-gray-700 hover:text-yellow-500" />
+              <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 hover:text-yellow-500" />
             </button>
+
             <button
               onClick={() => navigate("/cart")}
               className="relative p-2 rounded-lg hover:bg-yellow-500/10 transition"
             >
-              <ShoppingBag className="w-6 h-6 text-gray-700 hover:text-yellow-500" />
+              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 hover:text-yellow-500" />
               {Array.isArray(cart?.items) && cart.items.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 text-[10px] flex items-center justify-center font-bold bg-yellow-500 text-white rounded-full">
                   {cart.items.length}
                 </span>
               )}
             </button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button>
-                  {/* <Avatar className="h-6 w-6">
-                            <AvatarImage
-                              src={getUserAvatar()}
-                              alt="User avatar"
-                              onError={() => setAvatarError(true)}
-                            />
-                            <AvatarFallback className="bg-primary text-primary-foreground">
-                              {getUserInitials()}
-                            </AvatarFallback>
-                          </Avatar> */}
-                  <UserIcon className="w-6 h-6 text-gray-700 hover:text-yellow-500" />
+                  <UserIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 hover:text-yellow-500" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -172,15 +161,14 @@ function Header() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-yellow-500/20">
-            <nav className="px-6 py-8 space-y-2">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-yellow-500/20 z-30">
+            <nav className="px-4 py-6 space-y-1">
               {navItems.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="block py-4 px-6 text-gray-700 hover:text-yellow-500 hover:bg-yellow-500/10 rounded-xl font-medium transition-all duration-300 transform hover:translate-x-2"
+                  className="block py-3 px-4 text-gray-700 hover:text-yellow-500 hover:bg-yellow-500/10 rounded-lg font-medium text-sm transition-all duration-300 transform hover:translate-x-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
@@ -191,7 +179,7 @@ function Header() {
                   <input
                     type="text"
                     placeholder="Search products..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-300"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"
                   />
                 </div>
               )}

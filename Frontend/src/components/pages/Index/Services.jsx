@@ -1,74 +1,81 @@
-import { ArrowRight, Sofa, Palette, Calendar } from 'lucide-react';
+import { ArrowRight, Sofa, Palette, Calendar } from "lucide-react";
 
 function Services() {
   return (
     <div className="py-8 md:py-24 bg-gradient-to-b from-white to-gray-50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl lg:text-6xl font-black text-gray-900 mb-6">
-            Our <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Services</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-4 sm:mb-6">
+            Our{" "}
+            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+              Services
+            </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Experience luxury redefined with our comprehensive suite of premium offerings.
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-xl mx-auto">
+            Experience luxury redefined with our comprehensive suite of premium
+            offerings.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
           {[
             {
               icon: Sofa,
               title: "Premium Sofas",
-              description: "Handcrafted masterpieces with luxurious fabrics and customizable designs tailored to your home.",
+              description:
+                "Handcrafted masterpieces with luxurious fabrics and customizable designs tailored to your home.",
               gradient: "from-sky-500 via-indigo-500 to-purple-500",
               delay: "0s",
             },
             {
               icon: Palette,
               title: "Designer Curtains",
-              description: "Bespoke curtains and blinds that match your interiors and enhance the aesthetics of your space.",
+              description:
+                "Bespoke curtains and blinds that match your interiors and enhance the aesthetics of your space.",
               gradient: "from-pink-500 via-rose-400 to-red-500",
               delay: "0.2s",
             },
             {
               icon: Calendar,
               title: "Free Home Demo",
-              description: "Exclusive consultation service — experience our products in your home before making a decision.",
+              description:
+                "Exclusive consultation service — experience our products in your home before making a decision.",
               gradient: "from-green-500 via-emerald-400 to-teal-500",
               delay: "0.4s",
             },
           ].map((service, index) => (
             <div
               key={index}
-              className="group relative p-8 bg-white rounded-3xl border border-gray-200 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:scale-[1.03] overflow-hidden"
+              className="group relative p-5 sm:p-6 md:p-8 bg-white rounded-2xl md:rounded-3xl border border-gray-200 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 md:hover:-translate-y-4 hover:scale-[1.02] md:hover:scale-[1.03] overflow-hidden"
               style={{ animationDelay: service.delay }}
             >
               <div
-                className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-3xl`}
+                className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl md:rounded-3xl`}
               ></div>
 
               <div
-                className={`relative w-20 h-20 bg-gradient-to-r ${service.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl`}
+                className={`relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r ${service.gradient} rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-105 sm:group-hover:scale-110 group-hover:rotate-3 sm:group-hover:rotate-6 transition-all duration-500 shadow-xl`}
               >
-                <service.icon className="w-10 h-10 text-white" />
+                <service.icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
               </div>
 
-              <h3 className="text-center text-2xl font-bold text-gray-800 mb-4 group-hover:text-yellow-500 transition-colors duration-300">
+              <h3 className="text-center text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-3 sm:mb-4 group-hover:text-yellow-500 transition-colors duration-300">
                 {service.title}
               </h3>
 
-              <p className="text-center text-gray-600 mb-6 leading-relaxed">
+              <p className="text-center text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 leading-relaxed">
                 {service.description}
               </p>
 
               <div className="text-center">
-                <button className="inline-flex items-center space-x-2 text-gray-800 font-semibold hover:text-yellow-500 transition-colors duration-300 group/btn">
+                <button className="inline-flex items-center space-x-2 text-sm sm:text-base text-gray-800 font-semibold hover:text-yellow-500 transition-colors duration-300 group/btn">
                   <span>Discover More</span>
                   <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform duration-300" />
                 </button>
               </div>
 
-              <div className="absolute top-4 right-4 w-2 h-2 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-opacity duration-500"></div>
-              <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-orange-400 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity duration-700"></div>
+              <div className="absolute top-3 right-3 w-2 h-2 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-opacity duration-500"></div>
+              <div className="absolute bottom-3 left-3 w-1.5 h-1.5 bg-orange-400 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity duration-700"></div>
             </div>
           ))}
         </div>

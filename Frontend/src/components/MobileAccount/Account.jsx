@@ -54,22 +54,6 @@ const Account = () => {
       color: "from-pink-100 to-pink-200 border-pink-200",
       iconColor: "text-pink-600",
     },
-    {
-      icon: Headset,
-      title: "Help Center",
-      description: "Get support and assistance",
-      path: "/help",
-      color: "from-green-100 to-green-200 border-green-200",
-      iconColor: "text-green-600",
-    },
-    {
-      icon: Tag,
-      title: "Coupons",
-      description: "Explore available discounts",
-      path: "/coupons",
-      color: "from-orange-100 to-orange-200 border-orange-200",
-      iconColor: "text-orange-600",
-    },
   ];
 
   const menuItems = [
@@ -115,24 +99,22 @@ const Account = () => {
   };
 
   return (
-    <div className="w-full mx-auto font-sans bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
-      {/* Header */}
-      <div className="flex items-center space-x-4 mb-6 pt-6 px-6 pb-4 bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10">
+    <div className="w-full mx-auto font-sans bg-gradient-to-br from-white via-blue-50 to-purple-100 min-h-screen">
+      <div className="flex items-center space-x-3 py-4 px-4 bg-white shadow-md border-b border-blue-100 sticky top-0 z-10">
         <button
           onClick={() => window.history.back()}
-          className="p-2 rounded-full hover:bg-blue-50 transition-colors duration-200"
+          className="p-2 rounded-full hover:bg-blue-100 transition"
         >
-          <ArrowLeft className="w-6 h-6 text-blue-600" />
+          <ArrowLeft className="w-5 h-5 text-blue-600" />
         </button>
-        <h1 className="text-xl font-bold text-gray-800">Account</h1>
+        <h1 className="text-lg font-semibold text-gray-800">Account</h1>
       </div>
 
-      <div className="px-6 pb-6">
-        {/* Profile Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-blue-100/50 p-6 mb-6">
-          <div className="flex space-x-4 items-center">
+      <div className="px-4 py-6">
+        <div className="bg-white rounded-2xl border border-blue-200 shadow-lg p-4 mb-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center space-x-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full border-4 border-white shadow-lg overflow-hidden">
+              <div className="w-14 h-14 rounded-full border-2 border-blue-300 overflow-hidden shadow-sm">
                 <img
                   src={userProfile.avatarSrc}
                   alt="User Avatar"
@@ -143,122 +125,104 @@ const Account = () => {
                   }}
                 />
                 <div
-                  className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg"
+                  className="w-full h-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-semibold text-base"
                   style={{ display: "none" }}
                 >
                   {user.fullName?.[0] || "U"}
                 </div>
               </div>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-3 border-white"></div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
             </div>
-            <div className="flex flex-col space-y-1">
-              <h2 className="text-lg font-bold text-gray-800">
+            <div className="flex flex-col">
+              <h2 className="text-base font-semibold text-gray-900">
                 {user.fullName}
               </h2>
-              <p className="text-blue-600 text-sm font-medium">
-                {userProfile.phone}
-              </p>
-              <div className="flex items-center space-x-1 mt-1">
-                <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                <span className="text-xs text-gray-600">Premium Member</span>
-              </div>
+              <p className="text-sm text-gray-600">{userProfile.phone}</p>
             </div>
           </div>
         </div>
 
-        {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {quickActions.map((action, index) => (
             <div
               key={index}
-              className={`bg-gradient-to-br ${action.color} p-4 rounded-2xl cursor-pointer transform hover:scale-105 transition-all duration-200 shadow-sm border`}
               onClick={() => action.path && navigate(action.path)}
+              className="bg-gradient-to-br from-blue-50 via-white to-purple-100 border border-blue-200 p-4 rounded-xl shadow-md hover:shadow-xl transform hover:scale-[1.03] transition-all duration-300 cursor-pointer flex items-center justify-center space-x-2"
             >
-              <div className="flex flex-col items-center text-center space-y-2">
-                <div className="p-3 bg-white/70 rounded-full">
-                  <action.icon className={`${action.iconColor} w-6 h-6`} />
-                </div>
-                <span className="text-sm font-semibold text-gray-800">
-                  {action.title}
-                </span>
-              </div>
-              <ChevronRight className="text-gray-500 w-4 h-4 ml-auto mt-2" />
+              <action.icon className="w-5 h-5 text-blue-700" />
+              <span className="text-sm font-medium text-gray-800">
+                {action.title}
+              </span>
             </div>
           ))}
         </div>
 
-        {/* Menu Items */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-blue-100/50 overflow-hidden">
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-blue-100/50">
-            <h3 className="font-bold text-gray-800 text-sm uppercase tracking-wide">
+        <div className="bg-white rounded-2xl shadow-lg border border-blue-100 overflow-hidden">
+          <div className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-100">
+            <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
               Account Settings
             </h3>
           </div>
 
-          <div className="divide-y divide-blue-50">
+          <div className="divide-y divide-gray-100">
             {menuItems.map((item, index) => (
               <div key={index}>
                 <div
-                  className="flex justify-between items-center p-4 hover:bg-blue-25 transition-colors duration-200 cursor-pointer"
+                  className="flex justify-between items-center p-4 hover:bg-blue-50 transition cursor-pointer"
                   onClick={() => handleItemClick(item)}
                 >
-                  <div className="flex space-x-4">
-                    <div className="p-2 rounded-full">
-                      <item.icon className="text-gray-700 w-5 h-5" />
-                    </div>
-                    <div className="flex flex-col space-y-1">
+                  <div className="flex space-x-3 items-start">
+                    <item.icon className="w-5 h-5 text-purple-600 mt-0.5" />
+                    <div className="flex flex-col">
                       <div className="flex items-center space-x-2">
-                        <span className="font-semibold text-gray-800">
+                        <span className="font-medium text-gray-800">
                           {item.title}
                         </span>
                         {item.badge && (
-                          <span className="text-xs px-2 py-1 rounded-full text-white bg-gradient-to-r from-pink-400 to-pink-500">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-pink-500 text-white shadow">
                             {item.badge}
                           </span>
                         )}
                       </div>
-                      {!(item.dropdown && openDropdowns[item.title]) && (
-                        <span className="text-sm text-gray-600">
+                      {!item.dropdown || !openDropdowns[item.title] ? (
+                        <span className="text-sm text-gray-500">
                           {item.description}
                         </span>
-                      )}
+                      ) : null}
                     </div>
                   </div>
+
                   {item.dropdown ? (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleDropdown(item.title);
                       }}
-                      className="ml-2 p-1 rounded-full hover:bg-blue-50 transition-colors"
+                      className="ml-2 p-1 rounded-full hover:bg-gray-100 transition"
                     >
                       <ChevronDown
-                        className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
                           openDropdowns[item.title] ? "rotate-180" : ""
                         }`}
                       />
                     </button>
                   ) : (
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
                   )}
                 </div>
+
                 {item.dropdown && openDropdowns[item.title] && (
-                  <div className="pl-12 pr-4 pb-2 pt-1 space-y-2">
+                  <div className="w-full px-4 pb-4 pt-2 flex  gap-3 justify-around">
                     {item.dropdown.map((subItem, subIdx) => (
                       <div
                         key={subIdx}
-                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors"
+                        className="flex flex-col items-center w-40 p-3 rounded-lg border border-blue-100 bg-white shadow hover:bg-blue-50 hover:shadow-md transition-all cursor-pointer"
                         onClick={() => navigate(subItem.path)}
                       >
-                        <subItem.icon className="w-4 h-4 text-blue-500" />
-                        <div>
-                          <span className="font-medium text-gray-700">
-                            {subItem.title}
-                          </span>
-                          <span className="block text-xs text-gray-500">
-                            {subItem.description}
-                          </span>
-                        </div>
+                        <subItem.icon className="w-4 h-4 text-blue-500 mb-1" />
+                        <span className="text-sm font-medium text-gray-800 text-center">
+                          {subItem.title}
+                        </span>
                       </div>
                     ))}
                   </div>
