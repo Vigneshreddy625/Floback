@@ -29,7 +29,7 @@ export const WishlistProvider = ({ children }) => {
 
       const data = await response.json();
       console.log("wishlist successful");
-      console.log(data.user); // Assuming user data is also returned
+      console.log(data.user); 
       setWishlist(data.data); 
     } catch (err) {
       const errorMessage = err.message || "Failed to fetch wishlist.";
@@ -51,7 +51,7 @@ export const WishlistProvider = ({ children }) => {
     try {
       const response = await fetch(`${API_URL}/wishlist`, {
         method: 'POST',
-        credentials: 'include', // Important for sending cookies
+        credentials: 'include', 
         headers: {
           'Content-Type': 'application/json',
         },
@@ -81,7 +81,7 @@ export const WishlistProvider = ({ children }) => {
     try {
       const response = await fetch(`${API_URL}/wishlist`, {
         method: 'DELETE',
-        credentials: 'include', // Important for sending cookies
+        credentials: 'include', 
         headers: {
           'Content-Type': 'application/json',
         },

@@ -9,7 +9,7 @@ export const addItemToCart = createAsyncThunk(
   "cart/addItemToCart",
   async ({ itemType, itemId, quantity = 1 }, { rejectWithValue }) => {
     try {
-      console.log("cart is going to get added")
+      console.log("cart is going to get added");
       const response = await axios.post(`/cart/add`, {
         itemType,
         itemId,
@@ -52,6 +52,7 @@ export const removeItemFromCart = createAsyncThunk(
     try {
       const response = await axios.delete(`/cart/remove/${itemId}/${itemType}`);
       toast.success(response.data.message || "Item removed from cart!");
+      fetchUserCart();
       return response.data;
     } catch (err) {
       const errorMessage =
@@ -93,7 +94,7 @@ export const clearUserCart = createAsyncThunk(
 );
 
 const initialState = {
-  cart: null, 
+  cart: null,
   loading: {
     fetch: false,
     add: false,
@@ -134,7 +135,7 @@ const cartSlice = createSlice({
       .addCase(fetchUserCart.rejected, (state, action) => {
         state.loading.fetch = false;
         state.error = action.payload;
-        state.cart = null; 
+        state.cart = null;
       })
 
       .addCase(addItemToCart.pending, (state) => {
@@ -170,8 +171,11 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(removeItemFromCart.fulfilled, (state, action) => {
+        const { itemId, itemType } = action.meta.arg;
+        state.cart.items = state.cart.items.filter(
+          (item) => !(item.itemId === itemId && item.itemType === itemType)
+        );
         state.loading.remove = false;
-        state.cart = action.payload.data || action.payload.cart;
         state.error = null;
       })
       .addCase(removeItemFromCart.rejected, (state, action) => {
@@ -195,7 +199,7 @@ const cartSlice = createSlice({
   },
 });
 
-export const { resetCartState } = cartSlice.actions; 
+export const { resetCartState } = cartSlice.actions;
 
 export default cartSlice.reducer;
 

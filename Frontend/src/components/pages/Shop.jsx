@@ -29,6 +29,7 @@ const Shop = () => {
   const {handleAddToWishlist} = useWishlistActions();
 
   const products = useSelector(selectProducts); 
+  console.log(products);
 
   const dispatch = useDispatch();
 

@@ -1,37 +1,14 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from "../../components/utils/axiosInstance"
 
 export const getAllProducts = createAsyncThunk(
   'products/getAllProducts',
   async (params = {}, { rejectWithValue }) => {
     try {
-      const queryParams = new URLSearchParams();
-      if (params.page) queryParams.append('page', params.page);
-      if (params.limit) queryParams.append('limit', params.limit);
-      if (params.category) queryParams.append('category', params.category);
-      if (params.material) queryParams.append('material', params.material);
-      if (params.style) queryParams.append('style', params.style);
-      if (params.pattern) queryParams.append('pattern', params.pattern);
-      if (params.minPrice) queryParams.append('minPrice', params.minPrice);
-      if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice);
-
-      const response = await fetch(`${API_BASE_URL}/products/all?${queryParams}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return rejectWithValue(data.message || 'Failed to fetch products');
-      }
-
-      return data.data;
+      const response = await axios.get('/products/all', { params });
+      return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Network error occurred');
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch products');
     }
   }
 );
@@ -40,22 +17,10 @@ export const getProductById = createAsyncThunk(
   'products/getProductById',
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return rejectWithValue(data.message || 'Failed to fetch product');
-      }
-
-      return data.data;
+      const response = await axios.get(`/products/${productId}`);
+      return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Network error occurred');
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch product');
     }
   }
 );
@@ -65,7 +30,7 @@ export const addProduct = createAsyncThunk(
   async (productData, { rejectWithValue }) => {
     try {
       const formData = new FormData();
-      
+
       formData.append('name', productData.name);
       formData.append('description', productData.description);
       formData.append('price', productData.price);
@@ -75,35 +40,30 @@ export const addProduct = createAsyncThunk(
       formData.append('pattern', productData.pattern || '');
       formData.append('inStock', productData.inStock);
       formData.append('quantityAvailable', productData.quantityAvailable);
-      
+
       if (productData.dimensions) {
         formData.append('dimensions', JSON.stringify(productData.dimensions));
       }
-      
+
       if (productData.mainImageUrl) {
         formData.append('mainImage', productData.mainImageUrl);
       }
-      
-      if (productData.additionalImageUrls && productData.additionalImageUrls.length > 0) {
+
+      if (productData.additionalImageUrls?.length > 0) {
         productData.additionalImageUrls.forEach((image) => {
           formData.append('additionalImages', image);
         });
       }
 
-      const response = await fetch(`${API_BASE_URL}/products/add`, {
-        method: 'POST',
-        body: formData,
+      const response = await axios.post('/products/add', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        return rejectWithValue(data.message || 'Failed to add product');
-      }
-
-      return data.data;
+      return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Network error occurred');
+      return rejectWithValue(error?.response?.data?.message || 'Failed to add product');
     }
   }
 );
@@ -112,23 +72,10 @@ export const updateProduct = createAsyncThunk(
   'products/updateProduct',
   async ({ productId, updateData }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/update/${productId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updateData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return rejectWithValue(data.message || 'Failed to update product');
-      }
-
-      return data.data;
+      const response = await axios.patch(`/products/update/${productId}`, updateData);
+      return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Network error occurred');
+      return rejectWithValue(error?.response?.data?.message || 'Failed to update product');
     }
   }
 );
@@ -137,25 +84,17 @@ export const deleteProduct = createAsyncThunk(
   'products/deleteProduct',
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/delete/${productId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return rejectWithValue(data.message || 'Failed to delete product');
-      }
-
-      return { productId, message: data.message };
+      const response = await axios.delete(`/products/delete/${productId}`);
+      return {
+        productId,
+        message: response?.data?.message || 'Product deleted successfully',
+      };
     } catch (error) {
-      return rejectWithValue(error.message || 'Network error occurred');
+      return rejectWithValue(error?.response?.data?.message || 'Failed to delete product');
     }
   }
 );
+
 
 const initialState = {
   products: [],

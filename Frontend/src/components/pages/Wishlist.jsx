@@ -3,9 +3,15 @@ import { useWishlist } from "../../wishlistContext/useWishlist";
 import { Button } from "../ui/button";
 import LoadingScreen from "../Items/LoadingScreen";
 import { useNavigate } from "react-router-dom";
-import { cardContainer, wishlistImage, removeButton, moveToBagButton } from "../utils/tailwindStyles"
+import {
+  cardContainer,
+  wishlistImage,
+  removeButton,
+  moveToBagButton,
+} from "../utils/tailwindStyles";
 import Header from "../Layout/Header";
 import { useDispatch } from "react-redux";
+import { useWishlistActions } from "../../hooks/wishlistHooks";
 
 const LazyImage = React.lazy(() =>
   Promise.resolve({
@@ -31,33 +37,21 @@ const Wishlist = () => {
     wishlistItems,
     loading: wishlistLoading,
     removeWishlistItem,
-    refetchWishlist
+    refetchWishlist,
   } = useWishlist();
+
+  const { handleMoveToBag } = useWishlistActions();
   // const {
   //   handleAddToCart,
   //   loading: addToCartLoading,
   // } = useAddToCart();
 
   useEffect(() => {
-  refetchWishlist();
-}, [refetchWishlist]);
+    refetchWishlist();
+  }, [refetchWishlist]);
 
   const navigate = useNavigate();
-  console.log(wishlistItems)
-
-  const toggleWishlist = async (item) => {
-    if (item.stockStatus !== "In Stock") {
-      navigate(`shop`);
-      return;
-    }
-
-    try {
-      handleAddToCart(item);
-      await removeWishlistItem({itemId : item.itemId._id, itemType : item.itemType});
-    } catch (error) {
-      console.error("Failed to move item to bag:", error);
-    }
-  };
+  console.log(wishlistItems);
 
   if (wishlistLoading) return <LoadingScreen />;
 
@@ -90,7 +84,10 @@ const Wishlist = () => {
 
                   <button
                     onClick={() =>
-                      removeWishlistItem({ itemId: item.itemId._id, itemType: item.itemType })
+                      removeWishlistItem({
+                        itemId: item.itemId._id,
+                        itemType: item.itemType,
+                      })
                     }
                     className={removeButton}
                     aria-label="Remove item"
@@ -126,14 +123,21 @@ const Wishlist = () => {
                       ₹{item.itemId.price}
                     </h3>
                   </div>
-                  <button
-                    onClick={() =>
-                      toggleWishlist({ itemId: item.itemId._id, itemType: item.itemType, ...item })
-                    }
-                    className={moveToBagButton(item.stockStatus)}
-                  >
-                    {item.isAvailable ? "MOVE TO BAG" : "SHOW SIMILAR"}
-                  </button>
+                  {item.isAvailable ? (
+                    <button
+                      onClick={() => handleMoveToBag(item)}
+                      className="cursor-pointer w-full py-2 px-4 text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 ease-in-out"
+                    >
+                      MOVE TO BAG
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => navigate("/shop")}
+                      className="cursor-pointer w-full py-2 px-4 text-sm font-semibold text-white bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 transition-all duration-200 ease-in-out"
+                    >
+                      SHOW SIMILAR
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

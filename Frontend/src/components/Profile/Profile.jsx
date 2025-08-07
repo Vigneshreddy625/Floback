@@ -49,13 +49,14 @@ export default function Profile() {
 }
 
 function ProfileItem({ label, value }) {
-  const isPlaceholder = value?.includes("not added");
+  const displayValue = value ? value : "- not added -";
+  const isPlaceholder = displayValue === "- not added -";
 
   return (
     <div className="flex justify-between items-center">
       <span className="text-gray-600 text-sm">{label}</span>
       <span className={`text-sm ${isPlaceholder ? 'text-gray-400 italic' : 'text-gray-800 font-medium'}`}>
-        {value}
+        {displayValue}
       </span>
     </div>
   );
