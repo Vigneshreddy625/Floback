@@ -10,15 +10,13 @@ const OrderSuccessModal = ({ isOpen, onClose }) => {
     let countdownTimer;
     
     if (isOpen) {
-      // Reset countdown when modal opens
       setCountdown(5);
       
-      // Countdown timer that updates every second
       countdownTimer = setInterval(() => {
         setCountdown(prev => {
           if (prev <= 1) {
             clearInterval(countdownTimer);
-            onClose(); // Close when countdown reaches 0
+            onClose(); 
             return 0;
           }
           return prev - 1;

@@ -15,6 +15,7 @@ import {
   ChevronRight,
   ShoppingCart,
   Sofa,
+  Calendar
 } from "lucide-react";
 import { useAuth } from "../authContext/useAuth";
 
@@ -37,6 +38,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     { icon: ShoppingCart, name: "Products", path: "products" },
     { icon: Users, name: "Fabrics", path: "fabrics" },
     { icon: Users, name: "Collections", path: "collections" },
+    { icon: Calendar, name: "Bookings", path: "bookings" },
   ];
 
   return (

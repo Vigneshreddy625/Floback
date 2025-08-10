@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useWishlistActions } from "../../hooks/wishlistHooks";
 import { cartHooks } from "../../hooks/userCartActions";
 import { useWishlist } from "../../wishlistContext/useWishlist";
+import LoadingScreen from "../Items/LoadingScreen";
 
 const FabricDetail = () => {
   const {wishlistItems} = useWishlist();
@@ -75,7 +76,7 @@ const handleNativeShare = () => {
     };
 
 
-  if (!fabricData) return <div>Loading or no fabric data...</div>;
+  if (!fabricData) return <LoadingScreen text = "Loading fabric details" />;
 
   const defaultFeatures = [
     "High-quality stitching",

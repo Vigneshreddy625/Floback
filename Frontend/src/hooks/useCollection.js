@@ -1,4 +1,3 @@
-// hooks/useCollections.js
 import { useState, useEffect } from 'react';
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
@@ -14,15 +13,13 @@ const useCollections = () => {
       try {
         setLoadingCollections(true);
         setErrorCollections(null);
-        // Replace with your actual API endpoint for fetching collections
-        const response = await fetch(`${API_BASE_URL}/collections/all`); // Assuming your API is at /api/collections
+        const response = await fetch(`${API_BASE_URL}/collections/all`); 
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const result = await response.json();
-        // Assuming your API response structure is like { success: true, data: [...] }
         setCollections(result.data.docs || []); 
       } catch (error) {
         console.error("Failed to fetch collections:", error);
@@ -33,7 +30,7 @@ const useCollections = () => {
     };
 
     fetchCollections();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []); 
 
   return { collections, loadingCollections, errorCollections };
 };

@@ -10,3 +10,13 @@ Currently, two official plugins are available:
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+await sendEmail({
+  to: "user@example.com",
+  templateAlias: "2d6f.117f7b546c6c096c.k1.f4c247f0-8a4e-11eb-9c3e-525400e3c1b1.16f10b8fb24", // Your actual template key
+  mergeInfo: {
+    user_name: "John Doe",
+    activation_link: "https://myapp.com/activate/123"
+  }
+});

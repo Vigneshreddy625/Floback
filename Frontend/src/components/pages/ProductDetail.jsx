@@ -22,6 +22,7 @@ import {
 } from "../../redux/Products/productSlice";
 import { useWishlist } from "../../wishlistContext/useWishlist";
 import { cartHooks } from "../../hooks/userCartActions";
+import LoadingScreen from "../Items/LoadingScreen";
 
 const ProductDetailPage = () => {
   const { wishlistItems } = useWishlist();
@@ -78,7 +79,7 @@ const ProductDetailPage = () => {
       }
     };
 
-  if (!productData) return <div>Loading or no product data...</div>;
+  if (!productData) return <LoadingScreen text = "Loading product details" />;
 
   const defaultFeatures = [
     "High-quality stitching",

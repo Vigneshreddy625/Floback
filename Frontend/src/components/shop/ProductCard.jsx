@@ -42,7 +42,7 @@ const ProductCard = ({ product, isFavorite, onToggleFavorite }) => {
         </div>
       </div>
 
-      <div className="p-3 sm:p-4 text-center">
+      <div className="p-3 sm:p-6 text-center">
         <p className="text-yellow-600 text-[10px] sm:text-xs uppercase tracking-wider mb-1 sm:mb-2">
           {product.category}
         </p>

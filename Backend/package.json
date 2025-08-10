@@ -37,6 +37,8 @@
     "mongoose-aggregate-paginate-v2": "^1.1.4",
     "multer": "^2.0.2",
     "nanoid": "^5.1.5",
-    "uuid": "^11.1.0"
+    "nodemailer": "^7.0.5",
+    "uuid": "^11.1.0",
+    "zeptomail": "^6.2.1"
   }
 }

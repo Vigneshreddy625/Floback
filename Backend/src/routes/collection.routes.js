@@ -9,6 +9,7 @@ import {
   collectionUploadMiddleware
 } from '../controllers/collection.controller.js';
 import { verifyAdmin, verifyJWT } from '../middlewares/auth.middleware.js';
+import { catchAsync } from '../utils/catchAsync.js';
 
 const router = Router();
 
@@ -19,25 +20,25 @@ router.post(
   collectionUploadMiddleware, 
   verifyJWT,
   verifyAdmin,
-  addCollection
+  catchAsync(addCollection)
 );
 
-router.get('/:collectionId', verifyJWT, getCollectionById);
+router.get('/:collectionId', verifyJWT, catchAsync(getCollectionById));
 
-router.get('/:collectionId/fabrics', verifyJWT, getCollectionWithFabrics);
+router.get('/:collectionId/fabrics', verifyJWT, catchAsync(getCollectionWithFabrics));
 
 router.patch(
   '/update/:collectionId',
   verifyJWT,
   verifyAdmin,
-  updateCollection
+  catchAsync(updateCollection)
 );
 
 router.delete(
   '/delete/:collectionId',
   verifyJWT,
   verifyAdmin,
-  deleteCollection
+  catchAsync(deleteCollection)
 );
 
 export default router;

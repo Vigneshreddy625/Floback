@@ -168,6 +168,15 @@ export default function MobileLogin() {
                 )}
               </div>
 
+              <div className="flex justify-center items-center">
+                <Link
+                  to="/reset-password"
+                  className="text-sm text-white font-medium hover:underline hover:opacity-80 transition"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+
               {errors.general && (
                 <div className="p-2 text-xs text-center text-red-500 bg-red-800 bg-opacity-40 rounded-md border border-red-500">
                   {errors.general}

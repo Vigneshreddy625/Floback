@@ -87,7 +87,7 @@ export const addItemToCart = async (req, res) => {
     );
 
     cart.tax = cart.subtotal * 0.08;
-    cart.shipping = cart.subtotal > 100 ? 0 : 10;
+    cart.shipping = cart.subtotal > 1000 ? 0 : 49;
     cart.total = cart.subtotal + cart.tax + cart.shipping;
 
     await cart.save();

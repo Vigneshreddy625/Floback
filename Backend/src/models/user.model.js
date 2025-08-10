@@ -22,7 +22,7 @@ const UserSchema = new Schema(
     },
     mobile: {
       type: String,
-      trim: true
+      trim: true,
     },
     role: {
       type: String,
@@ -31,17 +31,17 @@ const UserSchema = new Schema(
     },
     gender: {
       type: String,
-      enum: ['Male', 'Female']
+      enum: ['Male', 'Female'],
     },
     dob: {
-      type : Date,
+      type: Date,
     },
-    alternateMobile : {
+    alternateMobile: {
       type: String,
-      trim: true
+      trim: true,
     },
     hintName: {
-      type: String
+      type: String,
     },
     refreshToken: {
       type: String,
@@ -51,6 +51,14 @@ const UserSchema = new Schema(
     },
     resetPasswordExpires: {
       type: Date,
+    },
+    emailVerificationToken: {
+      type: String,
+      select: false,
+    },
+    emailVerificationExpires: {
+      type: Date,
+      select: false,
     },
     wishlist: [
       {

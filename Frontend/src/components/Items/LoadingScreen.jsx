@@ -1,13 +1,12 @@
 import React from "react";
-import Skeleton from "react-loading-skeleton";
-import 'react-loading-skeleton/dist/skeleton.css';
+import { Loader2 } from "lucide-react";
 
-const LoadingScreen = () => {
+const LoadingScreen = ({ text = "Loading..." }) => {
   return (
-    <div className="w-full flex flex-col justify-center items-center min-h-screen px-4">
-      <Skeleton circle height={50} width={50} />
-      <div className="mt-6 w-48">
-        <Skeleton height={20} />
+    <div className="w-full min-h-screen flex items-center justify-center bg-white">
+      <div className="flex flex-col items-center space-y-4">
+        <Loader2 className="w-10 h-10 text-amber-500 animate-spin" />
+        <p className="text-lg text-gray-600 font-medium">{text}</p>
       </div>
     </div>
   );

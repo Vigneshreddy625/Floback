@@ -6,15 +6,16 @@ import {
   updateAddress,
   deleteAddress,
 } from '../controllers/address.controller.js';
+import { catchAsync } from '../utils/catchAsync.js';
 
 const router = Router();
 
 router.route('/')
-  .post(verifyJWT, createAddress)
-  .get(verifyJWT, getAddresses);
+  .post(verifyJWT, catchAsync(createAddress))
+  .get(verifyJWT, catchAsync(getAddresses));
 
 router.route('/:id')
-  .put(verifyJWT, updateAddress)
-  .delete(verifyJWT, deleteAddress);
+  .put(verifyJWT, catchAsync(updateAddress))
+  .delete(verifyJWT, catchAsync(deleteAddress));
 
 export default router;

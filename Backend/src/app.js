@@ -44,6 +44,7 @@ import orderRouter from "./routes/order.routes.js"
 import fabricRouter from "./routes/fabric.routes.js"
 import collectionRouter from "./routes/collection.routes.js"
 import adminRouter from "./routes/admin.routes.js"
+import bookingRouter from "./routes/booking.routes.js"
 
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/users", userRouter);
@@ -54,6 +55,6 @@ app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/fabrics", fabricRouter);
 app.use("/api/v1/collections", collectionRouter);
-
+app.use("/api/v1/bookings", bookingRouter)
 
 export { app }

@@ -5,13 +5,14 @@ import {
   getUserWishlist,
 } from '../controllers/wishlist.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
+import { catchAsync } from '../utils/catchAsync.js';
 
 const router = Router();
 
 router
   .route('/')
-  .post(verifyJWT, addWishlistItem)
-  .get(verifyJWT, getUserWishlist)
-  .delete(verifyJWT, removeFromWishlist);
+  .post(verifyJWT, catchAsync(addWishlistItem))
+  .get(verifyJWT, catchAsync(getUserWishlist))
+  .delete(verifyJWT, catchAsync(removeFromWishlist));
 
 export default router;

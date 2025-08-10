@@ -6,6 +6,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import mongoose from 'mongoose';
 import { Cart } from '../models/cart.model.js';
+import { sendEmail } from '../utils/sendEmail.js';
 
 export const clearCartForOrder = async (userId) => {
   const cart = await Cart.findOne({ user: userId });
@@ -17,7 +18,7 @@ export const clearCartForOrder = async (userId) => {
   cart.items = [];
   cart.subtotal = 0;
   cart.total = 0;
-  cart.shippingMethod = 'Standard'; 
+  cart.shippingMethod = 'Standard';
 
   await cart.save();
 };
@@ -34,152 +35,54 @@ export const placeOrder = async (req, res) => {
     shippingAddress: clientShippingAddress,
   } = req.body;
 
-  // Validation errors array to collect all missing fields
   const validationErrors = [];
 
-  // Validate main order fields
   if (!user) {
     validationErrors.push({
       field: 'user',
-      message: 'User information is required'
+      message: 'User information is required',
     });
   }
 
   if (!items) {
     validationErrors.push({
       field: 'items',
-      message: 'Items array is required'
+      message: 'Items array is required',
     });
   } else if (items.length === 0) {
     validationErrors.push({
       field: 'items',
-      message: 'At least one item is required in the order'
+      message: 'At least one item is required in the order',
     });
   }
 
   if (subtotal === undefined || subtotal === null) {
     validationErrors.push({
       field: 'subtotal',
-      message: 'Subtotal is required'
+      message: 'Subtotal is required',
     });
   }
 
   if (tax === undefined || tax === null) {
     validationErrors.push({
       field: 'tax',
-      message: 'Tax amount is required'
+      message: 'Tax amount is required',
     });
   }
 
   if (total === undefined || total === null) {
     validationErrors.push({
       field: 'total',
-      message: 'Total amount is required'
+      message: 'Total amount is required',
     });
   }
 
   if (shipping === undefined || shipping === null) {
     validationErrors.push({
       field: 'shipping',
-      message: 'Shipping cost is required'
+      message: 'Shipping cost is required',
     });
   }
-
-  // Validate shipping address
-  // if (!clientShippingAddress) {
-  //   validationErrors.push({
-  //     field: 'shippingAddress',
-  //     message: 'Shipping address is required'
-  //   });
-  // } else {
-  //   // Validate individual shipping address fields
-  //   const shippingFields = [
-  //     { key: 'name', message: 'Recipient name is required' },
-  //     { key: 'mobile', message: 'Mobile number is required' },
-  //     { key: 'locality', message: 'Locality is required' },
-  //     { key: 'street', message: 'Street address is required' },
-  //     { key: 'city', message: 'City is required' },
-  //     { key: 'district', message: 'District is required' },
-  //     { key: 'state', message: 'State is required' },
-  //     { key: 'country', message: 'Country is required' },
-  //     { key: 'postalCode', message: 'Postal code is required' }
-  //   ];
-
-  //   shippingFields.forEach(({ key, message }) => {
-  //     const value = clientShippingAddress[key];
-  //     const isEmpty = !value || 
-  //       (typeof value === 'string' && value.trim() === '') ||
-  //       (typeof value === 'number' && isNaN(value)) ||
-  //       value === null ||
-  //       value === undefined;
-        
-  //     if (isEmpty) {
-  //       validationErrors.push({
-  //         field: `shippingAddress.${key}`,
-  //         message: message
-  //       });
-  //     }
-  //   });
-  // }
-
-  // // Additional validation for items array structure (if items exist)
-  // if (items && items.length > 0) {
-  //   items.forEach((item, index) => {
-  //     const requiredItemFields = [
-  //       { key: 'itemType', message: 'Item type is required' },
-  //       { key: 'itemId', message: 'Item ID is required' },
-  //       { key: 'quantity', message: 'Quantity is required' },
-  //       { key: 'price', message: 'Price is required' },
-  //       { key: 'title', message: 'Item title is required' }
-  //     ];
-
-  //     requiredItemFields.forEach(({ key, message }) => {
-  //       if (!item[key] || (typeof item[key] === 'string' && item[key].trim() === '')) {
-  //         validationErrors.push({
-  //           field: `items[${index}].${key}`,
-  //           message: `${message} for item ${index + 1}`
-  //         });
-  //       }
-  //     });
-
-  //     // Validate numeric fields
-  //     if (item.quantity !== undefined && (isNaN(item.quantity) || item.quantity <= 0)) {
-  //       validationErrors.push({
-  //         field: `items[${index}].quantity`,
-  //         message: `Quantity must be a positive number for item ${index + 1}`
-  //       });
-  //     }
-
-  //     if (item.price !== undefined && (isNaN(item.price) || item.price < 0)) {
-  //       validationErrors.push({
-  //         field: `items[${index}].price`,
-  //         message: `Price must be a valid number for item ${index + 1}`
-  //       });
-  //     }
-  //   });
-  // }
-
-  // // Validate numeric fields
-  // const numericFields = ['subtotal', 'tax', 'total', 'shipping'];
-  // numericFields.forEach(field => {
-  //   const value = req.body[field];
-  //   if (value !== undefined && value !== null && (isNaN(value) || value < 0)) {
-  //     validationErrors.push({
-  //       field: field,
-  //       message: `${field.charAt(0).toUpperCase() + field.slice(1)} must be a valid positive number`
-  //     });
-  //   }
-  // });
-
-  // // If there are validation errors, return them
-  // if (validationErrors.length > 0) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: 'Validation failed',
-  //     errors: validationErrors,
-  //     totalErrors: validationErrors.length
-  //   });
-  // }
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -210,6 +113,8 @@ export const placeOrder = async (req, res) => {
       orderStatus: 'Pending',
     });
 
+    console.log(user);
+
     const userId = user._id || user.id;
 
     const savedOrder = await newOrder.save({ session });
@@ -218,6 +123,129 @@ export const placeOrder = async (req, res) => {
     session.endSession();
 
     await clearCartForOrder(user);
+
+    try {
+      const orderHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; margin: 20px auto;">
+          <tr>
+            <td style="padding: 40px 30px;">
+              <!-- Header with Logo -->
+              <div style="text-align: center; margin-bottom: 30px;">
+                <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: auto; display: block; margin: 0 auto;">
+              </div>
+              
+              <!-- Main Content -->
+              <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <h2 style="color: #2c3e50; margin-bottom: 20px;">Thank you for your order, ${user.name || 'Customer'}!</h2>
+                <p style="font-size: 16px; margin-bottom: 20px;">Your order <strong>#${savedOrder.orderId}</strong> has been placed successfully and is being processed.</p>
+
+                <h3 style="color: #34495e; margin-top: 30px; margin-bottom: 20px; border-bottom: 2px solid #3498db; padding-bottom: 5px;">Order Summary:</h3>
+                
+                <!-- Order Items -->
+                <table width="100%" cellpadding="10" cellspacing="0" style="border-collapse: collapse;">
+                  ${orderItems
+                    .map(
+                      (item) => `
+                  <tr style="border-bottom: 1px solid #eee;">
+                    <td style="width: 80px; padding: 15px 10px;">
+                      <img src="${item.imageUrl}" alt="${item.title}" 
+                           style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; display: block;"
+                           onerror="this.src='https://via.placeholder.com/70x70?text=Image'">
+                    </td>
+                    <td style="padding: 15px 10px;">
+                      <p style="margin: 0; font-weight: bold; font-size: 16px; color: #2c3e50;">${item.title}</p>
+                      <p style="margin: 5px 0; color: #7f8c8d;">Quantity: ${item.quantity} × ₹${item.price}</p>
+                      <p style="margin: 5px 0; font-weight: bold; color: #27ae60;">Subtotal: ₹${(item.quantity * item.price).toFixed(2)}</p>
+                    </td>
+                  </tr>
+                  `
+                    )
+                    .join('')}
+                </table>
+
+                <!-- Order Totals -->
+                <table width="100%" cellpadding="5" cellspacing="0" style="margin-top: 30px; border-top: 2px solid #ecf0f1;">
+                  <tr>
+                    <td style="text-align: right; padding: 10px; font-size: 16px;">
+                      <strong>Subtotal:</strong>
+                    </td>
+                    <td style="text-align: right; padding: 10px; font-size: 16px; width: 100px;">
+                      ₹${subtotal}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: right; padding: 10px; font-size: 16px;">
+                      <strong>Tax:</strong>
+                    </td>
+                    <td style="text-align: right; padding: 10px; font-size: 16px;">
+                      ₹${tax}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: right; padding: 10px; font-size: 16px;">
+                      <strong>Shipping:</strong>
+                    </td>
+                    <td style="text-align: right; padding: 10px; font-size: 16px;">
+                      ₹${shipping ? shipping : 0}
+                    </td>
+                  </tr>
+                  <tr style="border-top: 2px solid #3498db;">
+                    <td style="text-align: right; padding: 15px 10px; font-size: 18px; font-weight: bold; color: #2c3e50;">
+                      <strong>Total:</strong>
+                    </td>
+                    <td style="text-align: right; padding: 15px 10px; font-size: 18px; font-weight: bold; color: #27ae60;">
+                      ₹${total}
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Additional Information -->
+                <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
+                  <h4 style="margin-top: 0; color: #2c3e50;">What's Next?</h4>
+                  <ul style="color: #666; line-height: 1.8;">
+                    <li>You'll receive a shipping confirmation email once your order is dispatched</li>
+                    <li>Track your order status in your account dashboard</li>
+                    <li>Contact our support team if you have any questions</li>
+                  </ul>
+                </div>
+
+                <!-- Footer -->
+                <div style="margin-top: 30px; text-align: center; color: #7f8c8d; font-size: 14px;">
+                  <p>Thank you for choosing Floriva!</p>
+                  <p>Need help? Contact us at <a href="mailto:support@floriva.com" style="color: #3498db;">support@floriva.com</a></p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+
+      await sendEmail({
+        to: req.user.email,
+        subject: `Order Confirmation - #${savedOrder.orderId}`,
+        html: orderHtml,
+        name: req.user.fullName || 'Customer',
+        fromName: 'Floriva Team',
+      });
+    } catch (emailErr) {
+      console.error('⚠️ Failed to send confirmation email:', emailErr.message);
+    }
 
     res.status(201).json({
       success: true,
@@ -231,23 +259,23 @@ export const placeOrder = async (req, res) => {
     console.error('Error placing order:', error);
 
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
         message: 'Database validation error',
-        error: error.message 
+        error: error.message,
       });
     }
 
     if (error.code === 11000) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         success: false,
-        message: 'Order ID collision, please try again.' 
+        message: 'Order ID collision, please try again.',
       });
     }
 
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Failed to place order. Please try again later.' 
+      message: 'Failed to place order. Please try again later.',
     });
   }
 };
@@ -419,10 +447,10 @@ export const getAllOrders = async (req, res) => {
         delivered: 'Delivered',
         completed: 'Delivered',
         pending: 'Pending',
-        cancelled: 'Cancelled', 
-        shipped: 'Shipped', 
-        returned: 'Returned', 
-        failed: 'Failed', 
+        cancelled: 'Cancelled',
+        shipped: 'Shipped',
+        returned: 'Returned',
+        failed: 'Failed',
       };
       filter.orderStatus = statusMap[status] || status;
     }
@@ -456,7 +484,7 @@ export const getAllOrders = async (req, res) => {
 
     const orders = await Order.find(filter)
       .populate('user')
-      .populate('items.itemId') 
+      .populate('items.itemId')
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit))

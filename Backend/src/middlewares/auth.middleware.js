@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model.js';
 import { ApiError } from '../utils/ApiError.js';
+import catchAsync from "../utils/catchAsync.js"
 
 export const verifyJWT = async (req, res, next) => {
   try {
@@ -47,7 +48,6 @@ export const verifyAdmin = async (req, res, next) => {
   }
 };
 
-// Optional: Super admin check for sensitive operations
 export const verifySuperAdmin = async (req, res, next) => {
   try {
     if (!req.user) {

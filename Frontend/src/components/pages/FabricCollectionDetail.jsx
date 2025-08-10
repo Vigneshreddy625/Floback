@@ -18,12 +18,15 @@ import {
 import { useWishlistActions } from "../../hooks/wishlistHooks";
 import { cartHooks } from "../../hooks/userCartActions";
 import { fetchUserCart } from "../../redux/Cart/cartSlice";
+import LoadingScreen from "../Items/LoadingScreen";
 
 const FabricCollectionDetail = () => {
   const location = useLocation();
   const collection = location.state?.collection;
   const dispatch = useDispatch();
   const { cart } = useSelector((state) => state.cart);
+
+  const { loading, error } = useSelector((state) => state.collections);
 
   const { handleAddToCart } = cartHooks();
 
@@ -45,7 +48,11 @@ const FabricCollectionDetail = () => {
   console.log(fabrics);
   console.log(cart);
 
-  if (!fabrics) {
+  if (loading) {
+    return <LoadingScreen text="Loading fabrics" />;
+  }
+
+  if (!fabrics || !fabrics.fabrics || fabrics.fabrics.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center">
         <div className="text-center p-12 bg-white rounded-3xl shadow-2xl border border-amber-100">
@@ -127,7 +134,7 @@ const FabricCollectionDetail = () => {
       </section>
 
       <section className="py-6 sm:py-10 md:py-14 bg-gradient-to-b from-white to-amber-50">
-        <div className="max-w-5xl mx-auto px-2 sm:px-4 md:px-6">
+        <div className="max-w-6xl mx-auto px-2 sm:px-4 md:px-6">
           <div className="text-center mb-6 sm:mb-8">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 font-serif">
               Discover Our Exquisite Collection
@@ -146,7 +153,7 @@ const FabricCollectionDetail = () => {
                   <img
                     src={fabric.mainImageUrl}
                     alt={fabric.name}
-                    className="w-full h-32 sm:h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-40 sm:h-64 object-cover transition-transform duration-500 group-hover:scale-105"
                   />
 
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -190,14 +197,6 @@ const FabricCollectionDetail = () => {
                     <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                       ₹{fabric.price.toLocaleString()}
                     </span>
-
-                    <button
-                      onClick={() => openWhatsApp(fabric.name)}
-                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full transition transform hover:scale-105 shadow hover:shadow-md flex items-center space-x-1 text-xs sm:text-sm"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span className="hidden sm:inline">Enquire</span>
-                    </button>
                   </div>
                 </div>
               </div>

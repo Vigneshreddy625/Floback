@@ -1,7 +1,7 @@
 import cors from "cors";
 
 const allowedOrigins = [
-  "https://revispy-nine.vercel.app",
+  process.env.FRONTEND_URL,
   "http://localhost:5173",
 ];
 

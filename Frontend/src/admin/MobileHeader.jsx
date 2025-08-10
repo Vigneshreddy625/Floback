@@ -2,11 +2,17 @@
 import React from "react";
 import { Mail, Search, User } from "lucide-react";
 import { useAuth } from "../authContext/useAuth";
+import { useLocation } from "react-router-dom";
 
 const MobileHeader = ({ onMenuClick }) => {
   const { user } = useAuth();
+  const location = useLocation();
+  const pathSegments = location.pathname.split('/').filter(Boolean);
+  const lastSegment = pathSegments[pathSegments.length - 1] || 'Dashboard';
+  const pageTitle = lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1);
   return (
     <div className="lg:hidden p-4 bg-white shadow-md flex justify-between items-center">
+      <div className="flex space-x-4 items-center">
       <button onClick={onMenuClick}>
         <svg
           className="w-6 h-6 text-gray-700"
@@ -18,6 +24,8 @@ const MobileHeader = ({ onMenuClick }) => {
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
+      <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">{pageTitle || "Dashboard"}</h1>
+      </div>
 
       <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-gray-100 flex justify-center items-center">

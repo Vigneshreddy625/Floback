@@ -15,6 +15,7 @@ import {
   X,
   ShoppingCart,
   Sofa,
+  Calendar,
 } from "lucide-react";
 import { useAuth } from "../authContext/useAuth";
 
@@ -24,6 +25,7 @@ const mobileNavItems = [
   { icon: ShoppingCart, name: "Products", path: "products" },
   { icon: Users, name: "Fabrics", path: "fabrics" },
   { icon: Users, name: "Collections", path: "collections" },
+  { icon: Calendar, name: "Bookings", path: "bookings" },
 ];
 
 const MobileSidebar = ({ isMobileOpen, setIsMobileOpen }) => {
