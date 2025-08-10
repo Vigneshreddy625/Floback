@@ -34,7 +34,7 @@ const Bookings = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(API_URL, {
+        const response = await axios.get(`${API_URL}/bookings/all`, {
           withCredentials: true,
           params: {
             page: currentPage,
