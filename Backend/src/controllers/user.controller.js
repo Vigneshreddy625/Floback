@@ -5,8 +5,9 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { sendEmail } from '../utils/sendEmail.js';
+import { catchAsync } from '../utils/catchAsync.js';
 
-const API_URL = process.env.FRONTED_URL
+const API_URL = process.env.FRONTEND_URL
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -33,7 +34,7 @@ const generateAccessAndRefreshToken = async (userId) => {
   }
 };
 
-const registerUser = async (req, res) => {
+const registerUser = catchAsync(async (req, res) => {
   const { email, password, fullName } = req.body;
 
   if ([fullName, email, password].some((field) => field?.trim() === '')) {
@@ -116,7 +117,7 @@ const registerUser = async (req, res) => {
         'User registered successfully. Please check your email to verify your account.'
       )
     );
-};
+});
 
 const verifyEmail = async (req, res) => {
   const { token } = req.query;
