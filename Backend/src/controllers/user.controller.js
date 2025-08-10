@@ -65,7 +65,7 @@ const registerUser = catchAsync(async (req, res) => {
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
       
       <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-        <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Company Logo" style="max-width: 150px;">
+        <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height:"100px">
       </div>
       
       <div style="padding: 30px;">
@@ -187,7 +187,7 @@ const resendVerificationEmail = async (req, res) => {
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
       
       <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-        <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Company Logo" style="max-width: 150px;">
+        <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Company Logo" style="max-width: 150px; height:"100px"">
       </div>
       
       <div style="padding: 30px;">
@@ -321,7 +321,7 @@ const forgotPassword = async (req, res) => {
     
     <!-- Header with logo -->
     <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-      <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Company Logo" style="max-width: 150px;">
+      <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height:"100px"">
     </div>
     
     <!-- Body content -->

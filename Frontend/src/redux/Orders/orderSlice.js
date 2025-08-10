@@ -80,9 +80,7 @@ export const updateOrderStatus = createAsyncThunk(
   }
 );
 
-// Initial state
 const initialState = {
-  // User orders
   userOrders: [],
   userOrdersPagination: {
     totalOrders: 0,
@@ -91,7 +89,6 @@ const initialState = {
     limit: 10,
   },
   
-  // All orders (admin view)
   allOrders: [],
   allOrdersPagination: {
     currentPage: 1,
@@ -108,10 +105,8 @@ const initialState = {
     sortBy: 'date',
   },
 
-  // Single order operations
   currentOrder: null,
   
-  // Loading states
   loading: {
     placeOrder: false,
     getUserOrders: false,
@@ -119,7 +114,6 @@ const initialState = {
     updateOrderStatus: false,
   },
   
-  // Error states
   error: {
     placeOrder: null,
     getUserOrders: null,
@@ -127,10 +121,8 @@ const initialState = {
     updateOrderStatus: null,
   },
   
-  // Success messages
   successMessage: null,
   
-  // Order statuses for filtering
   orderStatuses: [
     'Pending',
     'Processing',
@@ -141,7 +133,6 @@ const initialState = {
     'Failed',
   ],
   
-  // Amount ranges for filtering
   amountRanges: [
     { value: 'any', label: 'Any Amount' },
     { value: '0-99', label: '₹0 - ₹99' },
@@ -150,62 +141,51 @@ const initialState = {
   ],
 };
 
-// Orders slice
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,
   reducers: {
-    // Clear errors
     clearError: (state, action) => {
       const errorType = action.payload;
       if (errorType && state.error[errorType]) {
         state.error[errorType] = null;
       } else {
-        // Clear all errors if no specific type provided
         Object.keys(state.error).forEach(key => {
           state.error[key] = null;
         });
       }
     },
     
-    // Clear success message
     clearSuccessMessage: (state) => {
       state.successMessage = null;
     },
     
-    // Set current order
     setCurrentOrder: (state, action) => {
       state.currentOrder = action.payload;
     },
     
-    // Clear current order
     clearCurrentOrder: (state) => {
       state.currentOrder = null;
     },
     
-    // Update filters for all orders
     setAllOrdersFilters: (state, action) => {
       state.allOrdersFilters = { ...state.allOrdersFilters, ...action.payload };
     },
     
-    // Reset all orders state
     resetAllOrders: (state) => {
       state.allOrders = [];
       state.allOrdersPagination = initialState.allOrdersPagination;
       state.allOrdersFilters = initialState.allOrdersFilters;
     },
     
-    // Reset user orders state
     resetUserOrders: (state) => {
       state.userOrders = [];
       state.userOrdersPagination = initialState.userOrdersPagination;
     },
     
-    // Update single order in lists (for real-time updates)
     updateOrderInLists: (state, action) => {
       const updatedOrder = action.payload;
       
-      // Update in user orders
       const userOrderIndex = state.userOrders.findIndex(
         order => order._id === updatedOrder._id
       );
@@ -213,7 +193,6 @@ const ordersSlice = createSlice({
         state.userOrders[userOrderIndex] = updatedOrder;
       }
       
-      // Update in all orders
       const allOrderIndex = state.allOrders.findIndex(
         order => order._id === updatedOrder._id
       );
@@ -221,7 +200,6 @@ const ordersSlice = createSlice({
         state.allOrders[allOrderIndex] = updatedOrder;
       }
       
-      // Update current order if it matches
       if (state.currentOrder && state.currentOrder._id === updatedOrder._id) {
         state.currentOrder = updatedOrder;
       }
@@ -229,7 +207,6 @@ const ordersSlice = createSlice({
   },
   
   extraReducers: (builder) => {
-    // Place Order
     builder
       .addCase(placeOrder.pending, (state) => {
         state.loading.placeOrder = true;
@@ -240,7 +217,6 @@ const ordersSlice = createSlice({
         state.loading.placeOrder = false;
         state.currentOrder = action.payload.order;
         state.successMessage = action.payload.message;
-        // Add new order to the beginning of user orders if they exist
         if (state.userOrders.length > 0) {
           state.userOrders.unshift(action.payload.order);
           state.userOrdersPagination.totalOrders += 1;
@@ -251,7 +227,6 @@ const ordersSlice = createSlice({
         state.error.placeOrder = action.payload;
       })
       
-    // Get User Orders
     builder
       .addCase(getUserOrders.pending, (state) => {
         state.loading.getUserOrders = true;
@@ -273,7 +248,6 @@ const ordersSlice = createSlice({
         state.userOrders = [];
       })
       
-    // Get All Orders
     builder
       .addCase(getAllOrders.pending, (state) => {
         state.loading.getAllOrders = true;
@@ -293,7 +267,6 @@ const ordersSlice = createSlice({
         state.allOrders = [];
       })
       
-    // Update Order Status
     builder
       .addCase(updateOrderStatus.pending, (state) => {
         state.loading.updateOrderStatus = true;
@@ -306,7 +279,6 @@ const ordersSlice = createSlice({
           const updatedOrder = action.payload.data;
           state.successMessage = action.payload.message;
           
-          // Update the order in all relevant arrays
           ordersSlice.caseReducers.updateOrderInLists(state, { payload: updatedOrder });
         }
       })
@@ -317,7 +289,6 @@ const ordersSlice = createSlice({
   },
 });
 
-// Export actions
 export const {
   clearError,
   clearSuccessMessage,
@@ -329,7 +300,6 @@ export const {
   updateOrderInLists,
 } = ordersSlice.actions;
 
-// Selectors
 export const selectUserOrders = (state) => state.orders.userOrders;
 export const selectUserOrdersPagination = (state) => state.orders.userOrdersPagination;
 export const selectAllOrders = (state) => state.orders.allOrders;
@@ -342,7 +312,6 @@ export const selectOrdersSuccessMessage = (state) => state.orders.successMessage
 export const selectOrderStatuses = (state) => state.orders.orderStatuses;
 export const selectAmountRanges = (state) => state.orders.amountRanges;
 
-// Complex selectors
 export const selectOrderById = (orderId) => (state) => {
   return state.orders.userOrders.find(order => order._id === orderId) ||
          state.orders.allOrders.find(order => order._id === orderId) ||
@@ -361,5 +330,4 @@ export const selectHasError = (state) => {
   return Object.values(state.orders.error).some(error => error !== null);
 };
 
-// Export reducer
 export default ordersSlice.reducer;
