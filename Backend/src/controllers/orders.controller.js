@@ -142,7 +142,7 @@ export const placeOrder = async (req, res) => {
             <td style="padding: 40px 30px;">
               <!-- Header with Logo -->
               <div style="text-align: center; margin-bottom: 30px;">
-                <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 20px; display: block; margin: 0 auto;">
+                <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px; display: block; margin: 0 auto;">
               </div>
               
               <!-- Main Content -->
