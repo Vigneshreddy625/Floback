@@ -1,4 +1,7 @@
 import { SendMailClient } from "zeptomail"
+import dotenv from "dotenv"
+
+dotenv.config('./.env')
 
 const client = new SendMailClient({
   url: process.env.ZEPTO_URL, 

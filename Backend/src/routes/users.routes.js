@@ -10,7 +10,9 @@ import {
   verifyEmail,
   resetPassword,
   validateResetToken,
-  forgotPassword
+  forgotPassword,
+  resendVerificationEmail,
+  resendRateLimit
 } from '../controllers/user.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { authRateLimit } from '../middlewares/rateLimiting.middleware.js';
@@ -22,6 +24,7 @@ router.route("/register").post(authRateLimit, catchAsync(registerUser));
 router.route("/login").post(authRateLimit, catchAsync(loginUser));
 router.route("/refresh-token").post(catchAsync(refreshAccessToken));
 router.route("/verify-email").get(catchAsync(verifyEmail));
+router.route("resend-verification").post(resendRateLimit, catchAsync(resendVerificationEmail));
 router.route("/update-details").patch(verifyJWT, catchAsync(userDetails));
 router.route("/forgot-password").post(catchAsync(forgotPassword));
 router.route("/validate-reset-token").get(catchAsync(validateResetToken));

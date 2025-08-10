@@ -106,6 +106,36 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const resendVerification = async (email) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(
+        "/users/resend-verification",
+        { email }, 
+        { withCredentials: true } 
+      );
+      const result = response.data;
+
+      if (!result.success) {
+        throw new Error(
+          result.message || "Failed to resend verification email"
+        );
+      }
+
+      return {
+        success: result.success,
+        message: result.message,
+      };
+    } catch (error) {
+      setError(error.message || "Unknown error");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const updateUserDetails = async (details) => {
     try {
       console.log("🔄 Starting updateUserDetails with:", details);
@@ -284,6 +314,7 @@ export const AuthProvider = ({ children }) => {
     updateUserDetails,
     refreshToken,
     deleteUser,
+    resendVerification,
     isAuthenticated: !!user,
   };
 

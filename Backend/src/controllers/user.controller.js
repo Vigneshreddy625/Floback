@@ -6,8 +6,9 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { sendEmail } from '../utils/sendEmail.js';
 import { catchAsync } from '../utils/catchAsync.js';
+import rateLimit from 'express-rate-limit';
 
-const API_URL = process.env.FRONTEND_URL
+const API_URL = process.env.FRONTEND_URL;
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -53,6 +54,9 @@ const registerUser = catchAsync(async (req, res) => {
     email,
   });
 
+  let emailSent = false;
+  let emailErrorMessage = null;
+
   const verificationToken = jwt.sign(
     { _id: user._id },
     process.env.EMAIL_VERIFICATION_SECRET,
@@ -65,7 +69,7 @@ const registerUser = catchAsync(async (req, res) => {
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
       
       <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-                        <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px; display: block; margin: 0 auto;">
+        <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px; display: block; margin: 0 auto;">
       </div>
       
       <div style="padding: 30px;">
@@ -79,7 +83,7 @@ const registerUser = catchAsync(async (req, res) => {
           </a>
         </div>
         
-        <p>This link is only valid for **24 hours**.</p>
+        <p>This link is only valid for <strong>24 hours</strong>.</p>
         <p>If you didn't create an account with us, please ignore this email. No further action is required.</p>
         <p>Best regards,<br>The Floriva Team</p>
       </div>
@@ -90,14 +94,19 @@ const registerUser = catchAsync(async (req, res) => {
     </div>
   `;
 
+  // Try to send verification email
   try {
     await sendEmail({
       to: email,
       subject: 'Verify Email Address',
       html: emailContent,
     });
-  } catch (emailError) {
-    console.error('Failed to send verification email:', emailError);
+    emailSent = true;
+    console.log(`Verification email sent successfully to ${email}`);
+  } catch (error) {
+    console.error('Failed to send verification email:', error);
+    emailErrorMessage = error.message;
+    // Don't throw error here - registration should succeed even if email fails
   }
 
   const createdUser = await User.findById(user._id).select(
@@ -108,18 +117,21 @@ const registerUser = catchAsync(async (req, res) => {
     throw new ApiError(500, 'Something went wrong while registering user');
   }
 
-  return res
-    .status(201)
-    .json(
-      new ApiResponse(
-        201,
-        createdUser,
-        'User registered successfully. Please check your email to verify your account.'
-      )
-    );
+  // Return response format that matches frontend expectations
+  return res.status(201).json(
+    new ApiResponse(
+      201,
+      {
+        user: createdUser,
+        emailSent: emailSent,
+        emailError: emailErrorMessage,
+      },
+      'User registered successfully. Please check your email to verify your account.'
+    )
+  );
 });
 
-const verifyEmail = async (req, res) => {
+const verifyEmail = catchAsync(async (req, res) => {
   const { token } = req.query;
 
   if (!token) {
@@ -136,29 +148,37 @@ const verifyEmail = async (req, res) => {
     }
 
     if (user.isVerified) {
-      return res
-        .status(200)
-        .json(new ApiResponse(200, null, 'Email already verified'));
+      // Redirect to frontend with success message
+      return res.redirect(`${process.env.FRONTEND_URL}/login?verified=already`);
     }
 
     user.isVerified = true;
     await user.save();
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, null, 'Email verified successfully'));
+    // Redirect to frontend with success message
+    return res.redirect(`${process.env.FRONTEND_URL}/login?verified=success`);
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      throw new ApiError(400, 'Verification token has expired');
-    }
-    if (error.name === 'JsonWebTokenError') {
-      throw new ApiError(400, 'Invalid verification token');
-    }
-    throw new ApiError(500, 'Email verification failed');
-  }
-};
+    let errorMessage = 'Email verification failed';
+    let redirectStatus = 'error';
 
-const resendVerificationEmail = async (req, res) => {
+    if (error.name === 'TokenExpiredError') {
+      errorMessage = 'Verification token has expired';
+      redirectStatus = 'expired';
+    } else if (error.name === 'JsonWebTokenError') {
+      errorMessage = 'Invalid verification token';
+      redirectStatus = 'invalid';
+    }
+
+    console.error('Email verification error:', error);
+
+    // Redirect to frontend with error status
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/login?verified=${redirectStatus}&error=${encodeURIComponent(errorMessage)}`
+    );
+  }
+});
+
+const resendVerificationEmail = catchAsync(async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -187,13 +207,13 @@ const resendVerificationEmail = async (req, res) => {
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
       
       <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-      <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px; display: block; margin: 0 auto;">
+        <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px; display: block; margin: 0 auto;">
       </div>
       
       <div style="padding: 30px;">
         <h2>Confirm Your Email Address</h2>
         <p>Hello ${user.fullName},</p>
-        <p>Thanks for signing up! To complete your registration and activate your account, just click the button below to verify your email address.</p>
+        <p>You requested a new verification email. To complete your registration and activate your account, just click the button below to verify your email address.</p>
         
         <div style="text-align: center; margin: 40px 0;">
           <a href="${verificationUrl}" style="background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; font-weight: bold; border-radius: 5px; font-size: 18px;">
@@ -201,8 +221,8 @@ const resendVerificationEmail = async (req, res) => {
           </a>
         </div>
         
-        <p>This link is only valid for **24 hours**.</p>
-        <p>If you didn't create an account with us, please ignore this email. No further action is required.</p>
+        <p>This link is only valid for <strong>24 hours</strong>.</p>
+        <p>If you didn't request this email, please ignore it. No further action is required.</p>
         <p>Best regards,<br>The Floriva Team</p>
       </div>
       
@@ -215,18 +235,41 @@ const resendVerificationEmail = async (req, res) => {
   try {
     await sendEmail({
       to: email,
-      subject: 'Verify Email Address',
+      subject: 'Verify Email Address - Resent',
       html: emailContent,
     });
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, null, 'Verification email sent successfully'));
-  } catch (emailError) {
-    console.error('Failed to send verification email:', emailError);
-    throw new ApiError(500, 'Failed to send verification email');
+    console.log(`Verification email resent successfully to ${email}`);
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          success: true,
+          message: 'Verification email sent successfully',
+        },
+        'Verification email sent successfully'
+      )
+    );
+  } catch (error) {
+    console.error('Failed to resend verification email:', error);
+    throw new ApiError(
+      500,
+      'Failed to send verification email. Please try again later.'
+    );
   }
-};
+});
+
+const resendRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  message: {
+    error: 'Too many verification email requests. Please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.body.email,
+});
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -640,4 +683,5 @@ export {
   forgotPassword,
   resetPassword,
   validateResetToken,
+  resendRateLimit
 };
