@@ -41,6 +41,7 @@ export default function VerifyEmail() {
 
         setTimeout(() => navigate("/login"), 2000);
       } catch (error) {
+        setMessage("Something went wrong please try again later!");
         setStatus("error");
         setTimeout(() => navigate("/login"), 2000);
       }

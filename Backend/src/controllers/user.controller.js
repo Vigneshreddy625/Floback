@@ -148,33 +148,25 @@ const verifyEmail = catchAsync(async (req, res) => {
     }
 
     if (user.isVerified) {
-      // Redirect to frontend with success message
-      return res.redirect(`${process.env.FRONTEND_URL}/login?verified=already`);
+      return res
+        .status(200)
+        .json(new ApiResponse(200, null, 'Email already verified'));
     }
 
     user.isVerified = true;
     await user.save();
 
-    // Redirect to frontend with success message
-    return res.redirect(`${process.env.FRONTEND_URL}/login?verified=success`);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, 'Email verified successfully'));
   } catch (error) {
-    let errorMessage = 'Email verification failed';
-    let redirectStatus = 'error';
-
     if (error.name === 'TokenExpiredError') {
-      errorMessage = 'Verification token has expired';
-      redirectStatus = 'expired';
-    } else if (error.name === 'JsonWebTokenError') {
-      errorMessage = 'Invalid verification token';
-      redirectStatus = 'invalid';
+      throw new ApiError(400, 'Verification token has expired');
     }
-
-    console.error('Email verification error:', error);
-
-    // Redirect to frontend with error status
-    return res.redirect(
-      `${process.env.FRONTEND_URL}/login?verified=${redirectStatus}&error=${encodeURIComponent(errorMessage)}`
-    );
+    if (error.name === 'JsonWebTokenError') {
+      throw new ApiError(400, 'Invalid verification token');
+    }
+    throw new ApiError(500, 'Email verification failed');
   }
 });
 
@@ -683,5 +675,5 @@ export {
   forgotPassword,
   resetPassword,
   validateResetToken,
-  resendRateLimit
+  resendRateLimit,
 };
