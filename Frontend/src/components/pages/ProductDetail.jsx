@@ -64,22 +64,46 @@ const ProductDetailPage = () => {
     window.open(`https://wa.me/917382178982?text=${message}`, "_blank");
   };
 
-  const handleNativeShare = () => {
-      if (navigator.share) {
-        navigator
-          .share({
-            title: "Check out this product!",
-            text: "👋 Hey! I found this product you might like:",
-            url: window.location.href,
-          })
-          .then(() => console.log("Shared successfully"))
-          .catch((error) => console.error("Error sharing:", error));
-      } else {
-        alert("Sharing is not supported in your browser.");
-      }
-    };
+  const handleNativeShare = async (product) => {
+    if (!navigator.share) {
+      alert("Sharing is not supported in your browser.");
+      return;
+    }
 
-  if (!productData) return <LoadingScreen text = "Loading product details" />;
+    try {
+      let shareData = {
+        title: `Check out ${product.name}!`,
+        text: `👋 Hey! I found this product you might like: ${product.name}`,
+        url: window.location.href,
+      };
+
+      if (product.mainImageUrl && navigator.canShare) {
+        try {
+          const response = await fetch(product.mainImageUrl);
+          const blob = await response.blob();
+          const fileName = product.name || "product.png";
+          const file = new File([blob], fileName, { type: blob.type });
+
+          if (navigator.canShare({ files: [file] })) {
+            shareData.files = [file];
+          }
+        } catch (err) {
+          console.warn("Image fetch failed, falling back to text-only share.");
+        }
+      }
+
+      await navigator.share(shareData);
+      console.log("Shared successfully!");
+    } catch (error) {
+      if (error.name === "AbortError" || error.name === "NotAllowedError") {
+        console.log("Share cancelled by user.");
+      } else {
+        console.error("Error sharing:", error);
+      }
+    }
+  };
+
+  if (!productData) return <LoadingScreen text="Loading product details" />;
 
   const defaultFeatures = [
     "High-quality stitching",
@@ -214,7 +238,10 @@ const ProductDetailPage = () => {
                     }`}
                   />
                 </button>
-                <button className="col-span-2 border border-gray-300 rounded-xl p-3 hover:bg-gray-100" onClick={handleNativeShare}>
+                <button
+                  className="col-span-2 border border-gray-300 rounded-xl p-3 hover:bg-gray-100"
+                  onClick={() => handleNativeShare(productData)}
+                >
                   <Share2 className="w-5 h-5 mx-auto text-gray-600" />
                 </button>
               </div>

@@ -68,7 +68,7 @@ const Cart = () => {
     dispatch(clearError("placeOrder"));
     dispatch(clearSuccessMessage());
     dispatch(clearCurrentOrder());
-    navigate("/home");
+    navigate("/shop");
   };
 
   const handleUpdateQuantity = useCallback((cartItemId, newQty) => {

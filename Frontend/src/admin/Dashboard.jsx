@@ -172,7 +172,7 @@ function DashboardPage() {
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
         <InfoCard
           title="Total Revenue"
-          value={calculateTotalAmount(orders)}
+          value={`₹${calculateTotalAmount(orders).toFixed(0)}`}
           icon={BarChart3}
           gradient="bg-gradient-to-br from-[#667eea] to-[#764ba2]"
         />

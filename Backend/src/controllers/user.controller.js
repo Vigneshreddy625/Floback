@@ -67,12 +67,7 @@ const registerUser = catchAsync(async (req, res) => {
 
   const emailContent = `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
-      
-      <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-        <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px; display: block; margin: 0 auto;">
-      </div>
-      
-      <div style="padding: 30px;">
+      <div style="padding: 10px 30px;">
         <h2>Confirm Your Email Address</h2>
         <p>Hello ${user.fullName},</p>
         <p>Thanks for signing up! To complete your registration and activate your account, just click the button below to verify your email address.</p>
@@ -94,7 +89,6 @@ const registerUser = catchAsync(async (req, res) => {
     </div>
   `;
 
-  // Try to send verification email
   try {
     await sendEmail({
       to: email,
@@ -106,7 +100,6 @@ const registerUser = catchAsync(async (req, res) => {
   } catch (error) {
     console.error('Failed to send verification email:', error);
     emailErrorMessage = error.message;
-    // Don't throw error here - registration should succeed even if email fails
   }
 
   const createdUser = await User.findById(user._id).select(
@@ -117,7 +110,6 @@ const registerUser = catchAsync(async (req, res) => {
     throw new ApiError(500, 'Something went wrong while registering user');
   }
 
-  // Return response format that matches frontend expectations
   return res.status(201).json(
     new ApiResponse(
       201,
@@ -198,11 +190,7 @@ const resendVerificationEmail = catchAsync(async (req, res) => {
   const emailContent = `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
       
-      <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-        <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px; display: block; margin: 0 auto;">
-      </div>
-      
-      <div style="padding: 30px;">
+      <div style="padding: 10px 30px;">
         <h2>Confirm Your Email Address</h2>
         <p>Hello ${user.fullName},</p>
         <p>You requested a new verification email. To complete your registration and activate your account, just click the button below to verify your email address.</p>
@@ -353,14 +341,8 @@ const forgotPassword = async (req, res) => {
 
   const emailContent = `
   <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
-    
-    <!-- Header with logo -->
-    <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-                      <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px; display: block; margin: 0 auto;">
-    </div>
-    
-    <!-- Body content -->
-    <div style="padding: 30px;">
+
+    <div style="padding: 10px 30px;">
       <h2>Password Reset Request</h2>
       <p>Hello ${user.fullName},</p>
       <p>We received a request to reset your password. To proceed, please click the button below:</p>

@@ -328,7 +328,7 @@ function Signup() {
           )}
         </button>
 
-        <div className="relative">
+        {/* <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-600"></div>
           </div>
@@ -347,7 +347,7 @@ function Signup() {
             alt=""
           />{" "}
           Google
-        </button>
+        </button> */}
       </form>
     </AuthLayout>
   );

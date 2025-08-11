@@ -56,9 +56,7 @@ const MobileSidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       >
         <div className="p-4 flex items-center justify-between border-b border-slate-700">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
-              <Sofa size={20} className="text-slate-800" />
-            </div>
+            <img src="/floriva-logo.ico" alt="" srcset="" className="w-12 h-12"/>
             <span className="font-semibold text-lg">Floriva</span>
           </div>
           <button onClick={() => setIsMobileOpen(false)}>

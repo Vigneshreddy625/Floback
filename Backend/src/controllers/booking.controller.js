@@ -62,14 +62,7 @@ const createBooking = async (req, res) => {
 
     const bookingConfirmationEmail = (booking) => `
   <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
-    
-    <!-- Header -->
-    <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-      <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px;">
-    </div>
-    
-    <!-- Body -->
-    <div style="padding: 30px;">
+    <div style="padding: 10px 30px;">
       <h2>Booking Confirmation</h2>
       <p>Hello ${booking.fullName},</p>
       <p>Thank you for choosing Floriva! Your booking is confirmed, and we’re excited to assist you.</p>      

@@ -59,13 +59,11 @@ function Header() {
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-gray-200 transition-all duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
-          <div className="flex items-center space-x-2 sm:space-x-3 group cursor-pointer">
+          <div className="flex items-center space-x-2 group cursor-pointer">
             <div className="relative">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25 group-hover:shadow-yellow-500/50 transition-all duration-300 group-hover:scale-110">
-                <Sofa className="w-6 h-6 sm:w-7 sm:h-7 text-black" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-pulse"></div>
+                <img src="./florivalogo.png" alt="Floriva Logo" className="w-14 h-14"/>
             </div>
+
             <div onClick={() => navigate("/home")}>
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
                 <span className="text-black">Flo</span>

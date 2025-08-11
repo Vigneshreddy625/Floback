@@ -188,7 +188,7 @@ function Login() {
           )}
         </button>
 
-        <div className="relative">
+        {/* <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-600"></div>
           </div>
@@ -209,10 +209,9 @@ function Login() {
             alt=""
           />{" "}
           Google
-        </button>
+        </button> */}
       </form>
 
-      {/* Admin Popup (unique to Login) */}
       {showAdminPopup && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4 sm:px-0">
           <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in border border-gray-200">

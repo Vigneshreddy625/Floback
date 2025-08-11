@@ -140,12 +140,6 @@ export const placeOrder = async (req, res) => {
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; margin: 20px auto;">
           <tr>
             <td style="padding: 40px 30px;">
-              <!-- Header with Logo -->
-              <div style="text-align: center; margin-bottom: 30px;">
-                <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px; display: block; margin: 0 auto;">
-              </div>
-              
-              <!-- Main Content -->
               <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                 <h2 style="color: #2c3e50; margin-bottom: 20px;">Thank you for your order, ${user.name || 'Customer'}!</h2>
                 <p style="font-size: 16px; margin-bottom: 20px;">Your order <strong>#${savedOrder.orderId}</strong> has been placed successfully and is being processed.</p>
@@ -165,8 +159,8 @@ export const placeOrder = async (req, res) => {
                     </td>
                     <td style="padding: 15px 10px;">
                       <p style="margin: 0; font-weight: bold; font-size: 16px; color: #2c3e50;">${item.title}</p>
-                      <p style="margin: 5px 0; color: #7f8c8d;">Quantity: ${item.quantity} × ₹${item.price}</p>
-                      <p style="margin: 5px 0; font-weight: bold; color: #27ae60;">Subtotal: ₹${(item.quantity * item.price).toFixed(2)}</p>
+                      <p style="margin: 5px 0; color: #7f8c8d;">Quantity: ${item.quantity} × ₹${(item.price).toFixed(0)}</p>
+                      <p style="margin: 5px 0; font-weight: bold; color: #27ae60;">Subtotal: ₹${(item.quantity * item.price).toFixed(0)}</p>
                     </td>
                   </tr>
                   `
@@ -181,7 +175,7 @@ export const placeOrder = async (req, res) => {
                       <strong>Subtotal:</strong>
                     </td>
                     <td style="text-align: right; padding: 10px; font-size: 16px; width: 100px;">
-                      ₹${subtotal}
+                      ₹${(subtotal).toFixed(0)}
                     </td>
                   </tr>
                   <tr>
@@ -189,7 +183,7 @@ export const placeOrder = async (req, res) => {
                       <strong>Tax:</strong>
                     </td>
                     <td style="text-align: right; padding: 10px; font-size: 16px;">
-                      ₹${tax}
+                      ₹${(tax).toFixed(0)}
                     </td>
                   </tr>
                   <tr>
@@ -205,7 +199,7 @@ export const placeOrder = async (req, res) => {
                       <strong>Total:</strong>
                     </td>
                     <td style="text-align: right; padding: 15px 10px; font-size: 18px; font-weight: bold; color: #27ae60;">
-                      ₹${total}
+                      ₹${(total).toFixed(0)}
                     </td>
                   </tr>
                 </table>
@@ -299,7 +293,7 @@ export const updateOrderStatus = async (req, res, next) => {
       throw new ApiError(400, 'Invalid order status.');
     }
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate('user', 'fullName email');
 
     if (!order) {
       throw new ApiError(404, 'Order not found.');
@@ -320,6 +314,39 @@ export const updateOrderStatus = async (req, res, next) => {
     }
 
     await order.save();
+
+     const orderStatusEmail = (order) => `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <div style="padding: 10px 30px;">
+          <h2>Order Status Update</h2>
+          <p>Hello ${order.user.fullName},</p>
+          <p>Your order <strong>#${order.orderId}</strong> status has been updated to <strong>${order.orderStatus}</strong>.</p>
+          <h3 style="margin-top: 20px;">Order Details</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><strong>Order ID:</strong> ${order.orderId}</li>
+            <li><strong>Status:</strong> ${order.orderStatus}</li>
+            ${order.shippedAt ? `<li><strong>Shipped At:</strong> ${order.shippedAt.toDateString()}</li>` : ''}
+            ${order.deliveredAt ? `<li><strong>Delivered At:</strong> ${order.deliveredAt.toDateString()}</li>` : ''}
+            ${order.cancelledAt ? `<li><strong>Cancelled At:</strong> ${order.cancelledAt.toDateString()}</li>` : ''}
+          </ul>
+          <p>If you have any questions about your order, please contact us by replying to this email.</p>
+          <p>Best regards,<br>The Floriva Team</p>
+        </div>
+        <div style="background-color: #f4f4f4; padding: 20px; text-align: center; font-size: 12px; color: #777; border-top: 1px solid #ddd;">
+          <p>&copy; ${new Date().getFullYear()} Floriva. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
+    try {
+      await sendEmail({
+        to: order.user.email,
+        subject: `Your order is now ${order.orderStatus}`,
+        html: orderStatusEmail(order),
+      });
+    } catch (emailError) {
+      console.error('Failed to send Order status email:', emailError);
+    }
 
     return res
       .status(200)
