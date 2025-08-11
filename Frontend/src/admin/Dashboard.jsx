@@ -53,7 +53,6 @@ const OrdersTable = ({ orders, formatDate }) => (
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {/* Use the 'orders' prop directly, which comes from Redux */}
           {orders.map((order) => (
             <tr key={order.orderId} className="hover:bg-gray-50 transition">
               <td className="px-4 py-4 font-medium text-gray-800">

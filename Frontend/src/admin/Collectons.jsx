@@ -3,20 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { ChevronLeft, ChevronRight, Edit, Plus } from "lucide-react";
 import useCollections from "../hooks/useCollection";
 
-import FilterBar from "./Filter"; 
-
 import {
-  getAllCollections, // Changed from fetchCollections to match slice export
+  getAllCollections, 
   setFilters,
   clearError,
   updateCollection,
-  selectCollections, // Use selectCollections to get the entire pagination object
-  selectCollectionsLoading, // Corrected selector name
-  selectCollectionsError, // Corrected selector name
-  selectCollectionsFilters, // Corrected selector name
-  // Removed selectTotalCollections, selectCurrentPage, selectOperationLoading, selectOperationError
-  // as their data is now accessed via selectCollections and selectCollectionsLoading/Error
-} from "../redux/Collections/collectionSlice"; // Corrected path/name for collectionSlice
+  selectCollections, 
+  selectCollectionsLoading, 
+  selectCollectionsError, 
+  selectCollectionsFilters, 
+} from "../redux/Collections/collectionSlice"; 
 import AddCollection from "./Modals/AddCollection";
 
 const AdminCollectionsList = () => {

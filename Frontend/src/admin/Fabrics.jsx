@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import useCollections from "../hooks/useCollection";
-import EditFabric from "./Modals/EditFabric"; // Assuming EditFabric modal component exists
+import EditFabric from "./Modals/EditFabric"; 
 
 import {
   fetchFilteredFabrics,
@@ -12,47 +12,33 @@ import {
   selectAllFabrics,
   selectFabricLoading,
   selectFabricError,
-  selectFabricFilters, // Using this consistently instead of selectCurrentFilters
-  selectFabricPagination, // New import for pagination data
-  selectFabricLoadingStates, // New import for specific operation loading states
-} from "../redux/Fabrics/fabricSlice"; // Corrected path/name for fabricSlice
+  selectFabricFilters, 
+  selectFabricPagination, 
+  selectFabricLoadingStates, 
+} from "../redux/Fabrics/fabricSlice"; 
 import FabricFilter from "./Filters/FabricFilter";
 
 const AdminFabricsList = () => {
   const dispatch = useDispatch();
   const {collections} = useCollections();
-
-  // Selectors from fabricSlice
   const fabrics = useSelector(selectAllFabrics);
-  const generalLoading = useSelector(selectFabricLoading); // General loading for initial fetch
-  const generalError = useSelector(selectFabricError); // General error state
+  const generalLoading = useSelector(selectFabricLoading); 
+  const generalError = useSelector(selectFabricError); 
 
-  // Destructure pagination data from the combined selector
   const { currentPage, totalPages, totalFabrics, hasNextPage, hasPrevPage } =
     useSelector(selectFabricPagination);
 
-  // Destructure specific operation loading states
   const { isAddingFabric, isUpdatingFabric, isDeletingFabric } = useSelector(
     selectFabricLoadingStates
   );
 
-  const currentFilters = useSelector(selectFabricFilters); // Get current filters
-
-  // Derive a combined loading state for operations (add, update, delete)
+  const currentFilters = useSelector(selectFabricFilters);
   const operationLoading = isAddingFabric || isUpdatingFabric || isDeletingFabric;
-  // The slice has a single 'error' state, so 'generalError' will cover all errors.
   const operationError = generalError;
 
-  // State for the fabric update modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fabricToEdit, setFabricToEdit] = useState(null);
 
-  /**
-   * Determines the stock status message and corresponding Tailwind CSS color class
-   * based on `quantityAvailable` from the fabric schema.
-   * @param {number} quantityAvailable - The exact quantity available.
-   * @returns {{status: string, color: string}} An object with the status string and color class.
-   */
   const getStockStatusAndColor = useCallback((quantityAvailable) => {
     if (quantityAvailable <= 0) {
       return { status: "Out of Stock", color: "text-red-600" };
@@ -63,7 +49,6 @@ const AdminFabricsList = () => {
     return { status: `In Stock (${quantityAvailable})`, color: "text-green-600" };
   }, []);
 
-  // Memoized function to fetch fabrics based on current filters
   const fetchData = useCallback(
     (filters) => {
       dispatch(fetchFilteredFabrics(filters));
@@ -71,59 +56,48 @@ const AdminFabricsList = () => {
     [dispatch]
   );
 
-  // Effect hook to fetch fabrics when current filters change
   useEffect(() => {
     fetchData(currentFilters);
   }, [currentFilters, fetchData]);
 
-  // Handler for changing pagination page
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       dispatch(setFilters({ ...currentFilters, page: newPage }));
     }
   };
 
-  // Handler for changing items per page limit
   const handleLimitChange = (e) => {
     const newLimit = parseInt(e.target.value, 10);
     dispatch(setFilters({ ...currentFilters, limit: newLimit, page: 1 }));
   };
 
-  // Handler for changes from the FilterBar component
   const handleFilterBarChange = (newFilters) => {
     dispatch(setFilters({ ...currentFilters, ...newFilters, page: 1 }));
   };
 
-  // Handler to open the modal for editing a specific fabric
   const handleEditClick = (fabric) => {
     setFabricToEdit(fabric);
     setIsModalOpen(true);
   };
 
-  // Handler to close the modal and clear any transient fabric-related errors
   const handleModalClose = () => {
     setIsModalOpen(false);
     setFabricToEdit(null);
-    dispatch(clearError()); // Clear any errors when modal closes
+    dispatch(clearError()); 
   };
 
-  // Handler for submitting the fabric update form from the modal
   const handleUpdateFabric = (formData) => {
-    if (formData && formData._id) {
-      // Dispatch the updateFabric thunk
+    if (formData && formData.fabricId) {
       dispatch(
-        updateFabric({ fabricId: formData._id, updateData: formData })
+        updateFabric({ fabricId: formData.fabricId, updateData: formData })
       )
         .unwrap()
         .then(() => {
-          // On successful update, refetch the current list to ensure data consistency
           fetchData(currentFilters);
           handleModalClose();
-          // Optionally, add a success toast notification here
         })
         .catch((err) => {
           console.error("Failed to update fabric:", err);
-          // Error is already being handled and displayed via operationError selector
         });
     }
   };
@@ -131,7 +105,6 @@ const AdminFabricsList = () => {
 
   console.log(collections)
 
-  // Conditional rendering for initial loading or error states before any data is shown
   if (generalLoading && fabrics.length === 0) {
     return <div className="text-center py-8">Loading fabrics...</div>;
   }
@@ -143,7 +116,6 @@ const AdminFabricsList = () => {
           onFilterChange={handleFilterBarChange}
           activeFilters={currentFilters}
         />
-        {/* Display loading and error messages for update operations */}
         {operationLoading && (
           <div className="text-center text-blue-500 py-2">
             Updating fabric...
@@ -177,7 +149,6 @@ const AdminFabricsList = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {fabrics.length > 0 ? (
                 fabrics.map((fabric) => {
-                  // Derive stock status and color using the helper function
                   const { status: stockStatusText, color: stockColorClass } =
                     getStockStatusAndColor(fabric.quantityAvailable);
                   return (

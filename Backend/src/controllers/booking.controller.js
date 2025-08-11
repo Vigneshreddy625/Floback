@@ -65,7 +65,7 @@ const createBooking = async (req, res) => {
     
     <!-- Header -->
     <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-      <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height:"100px";>
+      <img src="https://res.cloudinary.com/dqhcyazcg/image/upload/v1754807479/floriva-logo_jflhcc.jpg" alt="Floriva" style="max-width: 150px; height: 60px;">
     </div>
     
     <!-- Body -->

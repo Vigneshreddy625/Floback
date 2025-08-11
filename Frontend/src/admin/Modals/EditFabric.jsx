@@ -1,23 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { Package, Palette, Ruler, Tag, Check, X, Plus, Trash2, Info, ShoppingCart } from "lucide-react";
+import {
+  Package,
+  Palette,
+  Ruler,
+  Tag,
+  Check,
+  X,
+  Plus,
+  Trash2,
+  Info,
+  ShoppingCart,
+} from "lucide-react";
 import useCollections from "../../hooks/useCollection";
 
 function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
-  const { collections, loadingCollections, errorCollections } = useCollections();
+  const { collections, loadingCollections, errorCollections } =
+    useCollections();
   const [formData, setFormData] = useState(() => ({
-    ...fabric,
-    dimensions: fabric.dimensions ? { ...fabric.dimensions } : { length: 0, width: 0, unit: "inches" },
-    features: fabric.features ? [...fabric.features] : [],
+    ...(fabric || {}),
+    dimensions: fabric?.dimensions || { length: 0, width: 0, unit: "inches" },
+    features: fabric?.features || [],
   }));
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
   useEffect(() => {
-    if (!loadingCollections && collections.length > 0 && !formData.collectionId) {
+    if (
+      !loadingCollections &&
+      collections.length > 0 &&
+      !formData.collectionId
+    ) {
       setFormData((prev) => ({
         ...prev,
-        collectionId: collections[0]._id, 
+        collectionId: collections[0]._id,
       }));
     }
   }, [loadingCollections, collections, formData.collectionId]);
@@ -36,10 +52,15 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
     } else {
       setFormData((prevData) => ({
         ...prevData,
-        [id]: type === "checkbox" ? checked : type === "number" ? parseFloat(value) : value,
+        [id]:
+          type === "checkbox"
+            ? checked
+            : type === "number"
+            ? parseFloat(value)
+            : value,
       }));
     }
-    setErrorMessage(""); 
+    setErrorMessage("");
   };
 
   const handleFeatureChange = (index, e) => {
@@ -62,7 +83,13 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
     setIsSubmitting(true);
     setErrorMessage("");
 
-    if (!formData.name || !formData.description || !formData.price || !formData.collectionId || formData.quantityAvailable === undefined) {
+    if (
+      !formData.name ||
+      !formData.description ||
+      !formData.price ||
+      !formData.collectionId ||
+      formData.quantityAvailable === undefined
+    ) {
       setErrorMessage("Please fill in all required fields (marked with *).");
       setIsSubmitting(false);
       return;
@@ -74,7 +101,7 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        onClose(); 
+        onClose();
       }, 2000);
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -83,7 +110,7 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
     }
   };
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
   if (showSuccess) {
     return (
@@ -92,8 +119,12 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
           <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
             <Check className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Fabric Updated!</h2>
-          <p className="text-gray-600">Your fabric details have been successfully updated.</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Fabric Updated!
+          </h2>
+          <p className="text-gray-600">
+            Your fabric details have been successfully updated.
+          </p>
         </div>
       </div>
     );
@@ -109,11 +140,13 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">Edit Fabric</h1>
-              <p className="text-indigo-100 text-sm">Update the details for your fabric</p>
+              <p className="text-indigo-100 text-sm">
+                Update the details for your fabric
+              </p>
             </div>
           </div>
           <button
-            onClick={onClose} 
+            onClick={onClose}
             className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
             aria-label="Close form"
           >
@@ -123,7 +156,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
 
         <div className="flex-1 overflow-y-auto p-6 space-y-8">
           {errorMessage && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative"
+              role="alert"
+            >
               <strong className="font-bold">Error!</strong>
               <span className="block sm:inline ml-2">{errorMessage}</span>
             </div>
@@ -131,17 +167,21 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
 
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-              <Package className="w-6 h-6 mr-3 text-indigo-600" />Basic Information
+              <Package className="w-6 h-6 mr-3 text-indigo-600" />
+              Basic Information
             </h2>
             <div className="grid gap-6 md:grid-cols-2">
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="name">
+                <label
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="name"
+                >
                   Fabric Name *
                 </label>
                 <input
                   id="name"
                   type="text"
-                  value={formData.name || ""} 
+                  value={formData.name || ""}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   placeholder="Enter a descriptive product name"
@@ -150,7 +190,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="description">
+                <label
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="description"
+                >
                   Fabric Description *
                 </label>
                 <textarea
@@ -165,7 +208,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="price">
+                <label
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="price"
+                >
                   Price ($) *
                 </label>
                 <div className="relative">
@@ -184,7 +230,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="collectionId">
+                <label
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="collectionId"
+                >
                   Collection *
                 </label>
                 {loadingCollections ? (
@@ -216,7 +265,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
               </div>
 
               <div className="md:col-span-2">
-                <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center" htmlFor="color">
+                <label
+                  className="text-sm font-semibold text-gray-700 mb-2 flex items-center"
+                  htmlFor="color"
+                >
                   <Palette className="w-4 h-4 mr-2" />
                   Primary Color
                 </label>
@@ -232,7 +284,12 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
                     <input
                       type="text"
                       value={formData.color || ""}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, color: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          color: e.target.value,
+                        }))
+                      }
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                       placeholder="#000000"
                     />
@@ -248,11 +305,15 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
 
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-              <Tag className="w-6 h-6 mr-3 text-purple-600" />Fabric Details
+              <Tag className="w-6 h-6 mr-3 text-purple-600" />
+              Fabric Details
             </h2>
             <div className="grid gap-6 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="material">
+                <label
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="material"
+                >
                   Material *
                 </label>
                 <input
@@ -267,7 +328,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="style">
+                <label
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="style"
+                >
                   Style
                 </label>
                 <input
@@ -281,7 +345,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="pattern">
+                <label
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="pattern"
+                >
                   Pattern
                 </label>
                 <input
@@ -295,7 +362,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="durability">
+                <label
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="durability"
+                >
                   Durability
                 </label>
                 <input
@@ -309,7 +379,9 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Features</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Features
+                </label>
                 <div className="space-y-3">
                   {formData.features.map((feature, index) => (
                     <div key={index} className="flex items-center space-x-2">
@@ -348,7 +420,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
                 </label>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1" htmlFor="length">
+                    <label
+                      className="block text-xs font-medium text-gray-600 mb-1"
+                      htmlFor="length"
+                    >
                       Length
                     </label>
                     <input
@@ -362,7 +437,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1" htmlFor="width">
+                    <label
+                      className="block text-xs font-medium text-gray-600 mb-1"
+                      htmlFor="width"
+                    >
                       Width
                     </label>
                     <input
@@ -376,7 +454,10 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1" htmlFor="unit">
+                    <label
+                      className="block text-xs font-medium text-gray-600 mb-1"
+                      htmlFor="unit"
+                    >
                       Unit
                     </label>
                     <select
@@ -398,11 +479,15 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
 
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-              <ShoppingCart className="w-6 h-6 mr-3 text-green-600" />Inventory Management
+              <ShoppingCart className="w-6 h-6 mr-3 text-green-600" />
+              Inventory Management
             </h2>
             <div className="grid gap-6 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="quantityAvailable">
+                <label
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  htmlFor="quantityAvailable"
+                >
                   Quantity Available *
                 </label>
                 <input
@@ -419,8 +504,12 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
 
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
-                  <h3 className="font-semibold text-gray-800">In Stock Status</h3>
-                  <p className="text-sm text-gray-600">Toggle Fabric availability</p>
+                  <h3 className="font-semibold text-gray-800">
+                    In Stock Status
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Toggle Fabric availability
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -438,11 +527,15 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
                 <div className="flex items-start space-x-3">
                   <Info className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-blue-800">Inventory Tips</h4>
+                    <h4 className="font-semibold text-blue-800">
+                      Inventory Tips
+                    </h4>
                     <ul className="text-sm text-blue-700 mt-1 space-y-1 list-disc pl-5">
                       <li>Set accurate quantities to avoid overselling.</li>
                       <li>Use "Out of Stock" when quantity reaches zero.</li>
-                      <li>Regular inventory updates improve customer experience.</li>
+                      <li>
+                        Regular inventory updates improve customer experience.
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -461,7 +554,7 @@ function EditFabric({ fabric, isOpen, onClose, onSubmit }) {
             Cancel
           </button>
           <button
-            type="submit" 
+            type="submit"
             onClick={handleSubmit}
             disabled={isSubmitting}
             className={`px-8 py-2 bg-gradient-to-r from-[#D4145A] to-[#FBB03B] hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-colors ${

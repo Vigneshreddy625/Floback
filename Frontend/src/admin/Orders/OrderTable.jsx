@@ -72,6 +72,8 @@ const OrderTable = ({
       onPageChange(currentPage + 1);
     };
 
+    console.log(orders);
+
     return (
       <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50/50">
         <div className="flex items-center gap-2">

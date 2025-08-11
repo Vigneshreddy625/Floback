@@ -177,7 +177,7 @@ const Collections = () => {
                     </div>
                     
                     <div className="pt-4">
-                      <button className="group bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 inline-flex items-center">
+                      <button className="group bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 inline-flex items-center" onClick={() => navigate("/shop")}>
                         <span>Explore Collection</span>
                         <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                       </button>

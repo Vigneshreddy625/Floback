@@ -7,9 +7,12 @@ import {
   DialogFooter,
   DialogDescription,
 } from "../../components/ui/dialog";
-import { Input } from "../../components/ui/input"
+import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
+import { updateOrderStatus, getAllOrders } from "../../redux/Orders/orderSlice";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 import {
   Select,
   SelectTrigger,
@@ -28,7 +31,7 @@ const statusOptions = [
   "Failed",
 ];
 
-const EditOrderStatusModal = ({ isOpen, onClose, order, onSubmit }) => {
+const EditOrderStatusModal = ({ isOpen, onClose, order }) => {
   const [status, setStatus] = useState("Shipped");
 
   useEffect(() => {
@@ -37,8 +40,22 @@ const EditOrderStatusModal = ({ isOpen, onClose, order, onSubmit }) => {
     }
   }, [order]);
 
-  const handleSubmit = () => {
-    onClose();
+  const dispatch = useDispatch();
+
+  const handleSubmit = async () => {
+    try {
+      await dispatch(updateOrderStatus({
+        orderId: order._id,
+        orderStatus: status,
+      }));
+      toast.success("Order status updated successfully");
+    } catch (err) {
+      console.error("Failed to update order status:", err);
+      toast.error("Order status couldnt be updated");
+    } finally {
+      dispatch(getAllOrders());
+      onClose(); 
+    }
   };
 
   if (!order) return null;
@@ -102,5 +119,4 @@ const EditOrderStatusModal = ({ isOpen, onClose, order, onSubmit }) => {
   );
 };
 
-
-export default EditOrderStatusModal
+export default EditOrderStatusModal;

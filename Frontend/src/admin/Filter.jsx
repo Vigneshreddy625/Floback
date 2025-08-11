@@ -12,46 +12,37 @@ const FilterBar = ({
   isOrdersPage,
   isProductsPage,
   onFilterChange,
-  activeFilters = {} // IMPORTANT: Ensure activeFilters is always an object, even if empty initially
+  activeFilters = {} 
 }) => {
   const [productFormModal, setProductFormModal] = useState(false);
-  const searchInputRef = useRef(null); // Ref for the search input
-  const searchTimeoutRef = useRef(null); // Ref for the search timeout
-
+  const searchInputRef = useRef(null); 
+  const searchTimeoutRef = useRef(null); 
   const selectStyle =
     "w-full bg-white text-black border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500";
 
-  // This useEffect ensures the search input visually reflects the activeFilters.search
-  // when activeFilters changes from the parent, preventing the input from "sticking".
   useEffect(() => {
     if (searchInputRef.current) {
       searchInputRef.current.value = activeFilters.search || "";
     }
-  }, [activeFilters.search]); // Depend on activeFilters.search
+  }, [activeFilters.search]); 
 
-  // IMPORTANT: This function now merges the new filter with the existing ones
   const handleFilterUpdate = (key, value) => {
-    // Construct the new set of filters by merging with existing active filters.
-    // This is crucial to maintain all current filters when one is updated.
     const updatedFilters = { ...activeFilters, [key]: value };
     onFilterChange(updatedFilters);
   };
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
-    // Clear previous timeout to ensure only the latest search term triggers a filter update
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
-    // Set new timeout to debounce the search input
     searchTimeoutRef.current = setTimeout(() => {
-      handleFilterUpdate("search", value); // Use the updated handleFilterUpdate
+      handleFilterUpdate("search", value); 
     }, 300);
   };
 
-  // Helper function to reset all filters by calling onFilterChange with an empty object
   const handleResetFilters = () => {
-    onFilterChange({}); // Reset all filters by passing an empty object
+    onFilterChange({}); 
   };
 
   return (
@@ -60,7 +51,7 @@ const FilterBar = ({
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 w-full">
           <input
             type="text"
-            ref={searchInputRef} // Attach ref here
+            ref={searchInputRef} 
             placeholder={isOrdersPage ? "Search orders..." : "Search products..."}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-black focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             onChange={handleSearchChange}
@@ -68,10 +59,7 @@ const FilterBar = ({
 
           {isOrdersPage && (
             <>
-              {/* Status Filter */}
               <Select
-                // Set value to activeFilters.status or "any" if not set,
-                // ensuring the Select component displays the correct current filter or "Any".
                 value={activeFilters.status || "any"}
                 onValueChange={(val) => handleFilterUpdate("status", val === "any" ? "" : val)}
               >
@@ -87,7 +75,6 @@ const FilterBar = ({
                 </SelectContent>
               </Select>
 
-              {/* Amount Range Filter */}
               <Select
                 value={activeFilters.amountRange || "any"}
                 onValueChange={(val) => handleFilterUpdate("amountRange", val === "any" ? "" : val)}
@@ -107,7 +94,6 @@ const FilterBar = ({
 
           {isProductsPage && (
             <>
-              {/* Category Filter */}
               <Select
                 value={activeFilters.category || "any"}
                 onValueChange={(val) => handleFilterUpdate("category", val === "any" ? "" : val)}
@@ -130,9 +116,7 @@ const FilterBar = ({
                 </SelectContent>
               </Select>
 
-              {/* Stock Status Filter */}
               <Select
-                // Corrected the key here from 'stock' to 'stockStatus' to match handleFilterUpdate
                 value={activeFilters.stockStatus || "any"}
                 onValueChange={(val) => handleFilterUpdate("stockStatus", val === "any" ? "" : val)}
               >
@@ -147,7 +131,6 @@ const FilterBar = ({
                 </SelectContent>
               </Select>
 
-              {/* Price Range Filter */}
               <Select
                 value={activeFilters.priceRange || "any"}
                 onValueChange={(val) => handleFilterUpdate("priceRange", val === "any" ? "" : val)}
@@ -177,9 +160,7 @@ const FilterBar = ({
             </button>
           )}
 
-          {/* Sort By Select */}
           <Select
-            // Defaulting to "date" for sortBy if not present in activeFilters
             value={activeFilters.sortBy || "date"}
             onValueChange={(val) => handleFilterUpdate("sortBy", val)}
           >
@@ -207,8 +188,6 @@ const FilterBar = ({
 
         </div>
       </div>
-
-      
     </>
   );
 };

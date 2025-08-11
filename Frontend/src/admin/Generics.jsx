@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 const GenericPage = () => {
   const location = useLocation();
   const pathName = location.pathname.substring(1);
-  const pageTitle = pathName.charAt(0).toUpperCase() + pathName.slice(1) || "Dashboard"; // Fallback for root "/"
+  const pageTitle = pathName.charAt(0).toUpperCase() + pathName.slice(1) || "Dashboard"; 
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 rounded-md">

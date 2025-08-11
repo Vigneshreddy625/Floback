@@ -299,7 +299,6 @@ const Orders = () => {
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
                 </div>
               ))}
 
@@ -343,7 +342,7 @@ const Orders = () => {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-100">
+              {/* <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-100">
                 <div>
                   {order.orderStatus === "Delivered" && (
                     <button className="text-sky-600 hover:text-sky-700 text-xs font-semibold bg-sky-50 hover:bg-sky-100 px-4 py-2 rounded-lg border border-sky-200 transition-colors">
@@ -351,7 +350,7 @@ const Orders = () => {
                     </button>
                   )}
                 </div>
-              </div>
+              </div> */}
             </div>
           ))}
 

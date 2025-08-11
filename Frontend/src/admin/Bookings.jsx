@@ -193,9 +193,8 @@ const Bookings = () => {
               />
             </div>
             <div className="relative">
-              <Filter className="hidden sm:absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <select
-                className="w-full sm:w-auto sm:pl-10 pr-8 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-400 focus:outline-none transition-colors bg-white text-sm"
+                className="w-full sm:w-auto pl-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-400 focus:outline-none transition-colors bg-white text-sm"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
